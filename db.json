@@ -1,0 +1,12 @@
+{
+  "trades": [],
+  "config": {},
+  "chatIds": [],
+  "notifications": [
+    {
+      "id": "0x03b9e3411bfa7366fd5548f8c66eb7615840a25ee3f31060980384f070a1c565",
+      "sent": false,
+      "message": "BNB bought at 1.00000000."
+    }
+  ]
+}
