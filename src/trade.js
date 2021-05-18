@@ -95,18 +95,8 @@ const buyToken = async (trade, amount) => {
 
     await bought.wait();
 
-    console.log(`${trade.token} bought at ${amount}.`);
     db.get("trades").remove({ tokenAddress: trade.tokenAddress }).write();
-
-    db.get("notifications")
-      .push({
-        id: bought.hash,
-        sent: false,
-        message: `${trade.token} bought at ${amount}.`,
-      })
-      .write();
-
-    console.log("Buy Limit reset.");
+    console.log(`Buy completed.`);
   } catch (e) {
     console.log(e);
   }
@@ -187,17 +177,7 @@ const sellToken = async (trade, amount) => {
 
     await sold.wait();
     db.get("trades").remove({ tokenAddress: trade.tokenAddress }).write();
-
-    console.log(`${trade.token} Sold at ${amount}.`);
-
-    db.get("notifications")
-      .push({
-        id: sold.hash,
-        sent: false,
-        message: `${trade.token} Sold at ${amount}.`,
-      })
-      .write();
-    console.log("Sell Limit reset.");
+    console.log(`Sell completed.`);
   } catch (e) {
     console.log(e);
   }
