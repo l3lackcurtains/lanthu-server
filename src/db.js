@@ -19,6 +19,7 @@ db.defaults({
   config: {},
   chatIds: [],
   notifications: [],
+  tokens: [],
 }).write();
 
 const BUSD = new Token(
