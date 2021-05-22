@@ -29,6 +29,7 @@
     "ethers": "^5.1.4",
     "express": "^4.17.1",
     "lowdb": "^1.0.0",
+    "mongoose": "^5.12.10",
     "node-fetch": "^2.6.1",
     "uniswap-bsc-sdk": "^3.0.3"
   }
