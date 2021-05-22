@@ -51,12 +51,7 @@ const buyToken = async (trade, amount) => {
       });
     }
 
-    const TOKEN = new Token(
-      ChainId.ROPSTEN,
-      trade.tokenAddress,
-      18,
-      trade.token
-    );
+    const TOKEN = new Token(ChainId.ROPSTEN, trade.address, 18, trade.token);
 
     const pair = await Fetcher.fetchPairData(BUSD, TOKEN, provider);
 
@@ -95,7 +90,8 @@ const buyToken = async (trade, amount) => {
 
     await bought.wait();
 
-    db.get("trades").remove({ tokenAddress: trade.tokenAddress }).write();
+    await TradeModal.deleteOne({ address: trade.address });
+
     console.log(`Buy completed.`);
   } catch (e) {
     console.log(e);
@@ -108,11 +104,7 @@ const sellToken = async (trade, amount) => {
 
     const to = wallet.address;
 
-    const tokenContract = new ethers.Contract(
-      trade.tokenAddress,
-      tokenABI,
-      wallet
-    );
+    const tokenContract = new ethers.Contract(trade.address, tokenABI, wallet);
 
     const allowance = await tokenContract.allowance(
       to,
@@ -133,12 +125,7 @@ const sellToken = async (trade, amount) => {
       });
     }
 
-    const TOKEN = new Token(
-      ChainId.ROPSTEN,
-      trade.tokenAddress,
-      18,
-      trade.token
-    );
+    const TOKEN = new Token(ChainId.ROPSTEN, trade.address, 18, trade.token);
 
     const pair = await Fetcher.fetchPairData(TOKEN, BUSD, provider);
 
@@ -176,7 +163,9 @@ const sellToken = async (trade, amount) => {
     );
 
     await sold.wait();
-    db.get("trades").remove({ tokenAddress: trade.tokenAddress }).write();
+
+    await TradeModal.deleteOne({ address: trade.address });
+
     console.log(`Sell completed.`);
   } catch (e) {
     console.log(e);

@@ -1,26 +1,43 @@
-const low = require("lowdb");
-const FileSync = require("lowdb/adapters/FileSync");
+const mongoose = require("mongoose");
+require("dotenv").config();
 const { Token, ChainId } = require("@uniswap/sdk");
 
-const adapter = new FileSync("db.json");
-const db = low(adapter);
+const dbUser = process.env.DB_USER;
+const dbPassword = process.env.DB_PASSWORD;
 
-db.defaults({
-  trades: [
-    {
-      tokenAddress: "0xc778417E063141139Fce010982780140Aa0cD5Ab",
-      token: "BNB",
-      toBuy: 1,
-      toSell: 0,
-      buyLimit: 180,
-      sellLimit: 0,
-    },
-  ],
-  config: {},
-  chatIds: [],
-  notifications: [],
-  tokens: [],
-}).write();
+mongoose.connect(
+  `mongodb+srv://${dbUser}:${dbPassword}@cluster0.93hh2.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
+  }
+);
+
+const Schema = mongoose.Schema;
+
+const tradeSchema = new Schema({
+  id: Number,
+  address: String,
+  type: {
+    type: String,
+    enum: ["BUY", "SELL"],
+    default: "BUY",
+  },
+  token: String,
+  amount: Number,
+  limit: Number,
+});
+
+const TradeModal = mongoose.model("Trade", tradeSchema);
+
+const tokenSchema = new Schema({
+  name: String,
+  address: String,
+});
+
+const TokenModal = mongoose.model("Token", tokenSchema);
 
 const BUSD = new Token(
   ChainId.ROPSTEN,
@@ -30,4 +47,4 @@ const BUSD = new Token(
   "DAI"
 );
 
-module.exports = { db, BUSD };
+module.exports = { BUSD, TradeModal, TokenModal };
