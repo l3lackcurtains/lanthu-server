@@ -10,9 +10,9 @@ const {
 } = require("@uniswap/sdk");
 
 const { ethers } = require("ethers");
-const { parseEther } = require("ethers/lib/utils");
+const { parseEther, formatEther } = require("ethers/lib/utils");
 const tokenABI = require("./abi/token.json");
-const { db, BUSD } = require("./db");
+const { BUSD, TradeModal } = require("./db");
 
 const GWEI = 1000 * 1000 * 1000;
 
@@ -51,6 +51,16 @@ const buyToken = async (trade, amount) => {
       });
     }
 
+    const balance = await tokenContract.balanceOf(to);
+    if (balance.lte(amountOut)) {
+      console.log(
+        `Low balance ${formatEther(balance)} < ${formatEther(
+          amountOut
+        )} for this trade.`
+      );
+      return;
+    }
+
     const TOKEN = new Token(ChainId.ROPSTEN, trade.address, 18, trade.token);
 
     const pair = await Fetcher.fetchPairData(BUSD, TOKEN, provider);
@@ -84,21 +94,23 @@ const buyToken = async (trade, amount) => {
       to,
       deadline,
       {
-        gasLimit: 6700000,
+        gasLimit: 5000000,
       }
     );
 
     await bought.wait();
 
-    await TradeModal.deleteOne({ address: trade.address });
+    await TradeModal.deleteOne({ id: trade.id });
 
     console.log(`Buy completed.`);
   } catch (e) {
+    console.log("Error on token buy!");
     console.log(e);
+    await TradeModal.deleteOne({ id: trade.id });
   }
 };
 
-const sellToken = async (trade, amount) => {
+const sellToken = async (trade, amount, tokenAmount) => {
   try {
     const amountIn = parseEther(amount.toString());
 
@@ -123,6 +135,18 @@ const sellToken = async (trade, amount) => {
       await provider.once(approved.hash, () => {
         console.log("Approved...");
       });
+    }
+
+    const balance = await tokenContract.balanceOf(to);
+    const tokenBalance = parseEther(tokenAmount.toString());
+
+    if (balance.lte(tokenBalance)) {
+      console.log(
+        `Low balance ${formatEther(balance)} < ${formatEther(
+          tokenBalance
+        )} for this trade.`
+      );
+      return;
     }
 
     const TOKEN = new Token(ChainId.ROPSTEN, trade.address, 18, trade.token);
@@ -158,17 +182,19 @@ const sellToken = async (trade, amount) => {
       to,
       deadline,
       {
-        gasLimit: 8500000,
+        gasLimit: 6700000,
       }
     );
 
     await sold.wait();
 
-    await TradeModal.deleteOne({ address: trade.address });
+    await TradeModal.deleteOne({ id: trade.id });
 
     console.log(`Sell completed.`);
   } catch (e) {
+    console.log("Error on token sell!");
     console.log(e);
+    await TradeModal.deleteOne({ id: trade.id });
   }
 };
 

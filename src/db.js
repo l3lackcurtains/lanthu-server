@@ -41,7 +41,7 @@ const TokenModal = mongoose.model("Token", tokenSchema);
 
 const BUSD = new Token(
   ChainId.ROPSTEN,
-  "0xc2118d4d90b274016cB7a54c03EF52E6c537D957",
+  "0xaD6D458402F60fD3Bd25163575031ACDce07538D",
   18,
   "DAI",
   "DAI"

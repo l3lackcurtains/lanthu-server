@@ -124,7 +124,7 @@ dBot.on("message", async (message) => {
     message.reply(`\n${tradeText}`);
   }
 
-  if (command === "trade:remove") {
+  if (command === "remove") {
     const subCommand = args.map((x) => x);
     if (subCommand.length !== 1) return;
     const id = parseInt(subCommand[0]);
@@ -133,6 +133,11 @@ dBot.on("message", async (message) => {
       await TradeModal.deleteOne({ id });
       message.reply(`Trade removed.`);
     }
+  }
+
+  if (command === "purge") {
+    await TradeModal.deleteMany();
+    message.reply(`All Trades removed.`);
   }
 });
 

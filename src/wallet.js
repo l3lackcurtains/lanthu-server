@@ -6,7 +6,10 @@ require("dotenv").config();
 //   { name: "Smart Chain", chainId: 56 }
 // );
 
-const provider = ethers.getDefaultProvider("ropsten");
+const provider = ethers.getDefaultProvider(
+  "ropsten",
+  "GHG4E1DKJUKICUYJWQSYRM3385MDYRRDP1"
+);
 
 const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 
