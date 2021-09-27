@@ -6,7 +6,8 @@
   "scripts": {
     "bot": "node src/index.js",
     "discord": "node src/discord",
-    "start": "npm-run-all -l -p bot discord"
+    "dev": "npm-run-all -l -p bot discord",
+    "start": "npm run bot"
   },
   "author": "",
   "license": "ISC",
