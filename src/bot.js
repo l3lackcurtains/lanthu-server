@@ -1,14 +1,20 @@
-const { TradeModal, BUSD } = require("./db");
-const { provider } = require("./wallet");
-const { ChainId, Fetcher, Route, Token } = require("@uniswap/sdk");
+const { TradeModal, BUSD, TokenModal, LogModal } = require("./common/db");
+const { provider, chainID } = require("./common/wallet");
+const { Fetcher, Route, Token } = require("@pancakeswap/sdk");
 const { buyToken, sellToken } = require("./trade");
 
 const startTheBot = async () => {
   const trades = await TradeModal.find();
 
   for (let trade of trades) {
+    // Skip success trades..
+    if (trade.success || trade.error) continue;
+
+    const tokenName = trade.token.toUpperCase();
+    const coin = await TokenModal.findOne({ name: tokenName });
+
     try {
-      const TOKEN = new Token(ChainId.ROPSTEN, trade.address, 18, trade.token);
+      const TOKEN = new Token(chainID, coin.address, 18, coin.name);
 
       const pair = await Fetcher.fetchPairData(BUSD, TOKEN, provider);
 
@@ -27,7 +33,7 @@ const startTheBot = async () => {
         console.log(
           `Start buying ${tokenAmount} ${TOKEN.symbol} (${amountUSD} USD) `
         );
-        await buyToken(trade, amountUSD, tokenAmount);
+        await buyToken(trade, coin, amountUSD, tokenAmount);
       } else if (
         trade.type === "SELL" &&
         trade.limit > 0 &&
@@ -38,12 +44,20 @@ const startTheBot = async () => {
         console.log(
           `Start selling ${tokenAmount} ${TOKEN.symbol} (${amountUSD} USD) `
         );
-        await sellToken(trade, amountUSD, tokenAmount);
+        await sellToken(trade, coin, amountUSD, tokenAmount);
       }
     } catch (e) {
-      console.log(`Error on token parse! ${trade.token}: ${trade.address}`);
-      console.log(`Deleting trade...`);
-      await TradeModal.deleteOne({ id: trade.id });
+      const msg = `Error on token parse! ${coin.name}: ${coin.address}`;
+      const newLog = new LogModal({ message: msg, details: e.toString() });
+      newLog.save();
+
+      console.log(e);
+      console.log(msg);
+
+      const tradeInDB = await TradeModal.findOne({ id: trade.id });
+      tradeInDB.error = true;
+      tradeInDB.success = false;
+      await tradeInDB.save();
     }
   }
 };
