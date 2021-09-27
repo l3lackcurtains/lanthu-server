@@ -105,8 +105,9 @@ const buyToken = async (trade, coin, amount, tokenAmount) => {
     tradeInDB.error = false;
     tradeInDB.success = true;
     await tradeInDB.save();
-
-    console.log(`Buy completed.`);
+    console.log(`Token Buy completed.`);
+    const msg = `${coin.name}: ${trade.amount} USD @ ${trade.limit} USD (${tokenAmount} ${coin.name})}`;
+    await sendMessage("Token Buy completed!", msg);
   } catch (e) {
     const msg = `Error on token buy! ${coin.name}: ${trade.amount} USD @ ${trade.limit} USD (${tokenAmount} ${coin.name})}`;
     const newLog = new LogModal({ message: msg, details: e.toString() });
@@ -118,6 +119,8 @@ const buyToken = async (trade, coin, amount, tokenAmount) => {
     tradeInDB.error = true;
     tradeInDB.success = false;
     await tradeInDB.save();
+
+    await sendMessage("Error on token buy", msg);
   }
 };
 
@@ -206,8 +209,10 @@ const sellToken = async (trade, coin, amount, tokenAmount) => {
     await tradeInDB.save();
 
     console.log(`Sell completed.`);
+    const msg = `${coin.name}: ${trade.amount} USD @ ${trade.limit} USD (${tokenAmount} ${coin.name})}`;
+    await sendMessage("Token Sell completed!", msg);
   } catch (e) {
-    const msg = `Error on token sell! ${coin.name}: ${coin.address}`;
+    const msg = `Error on token sell! ${coin.name}: ${trade.amount} USD @ ${trade.limit} USD (${tokenAmount} ${coin.name})}`;
     const newLog = new LogModal({ message: msg, details: e.toString() });
     newLog.save();
     console.log(e);
@@ -217,6 +222,8 @@ const sellToken = async (trade, coin, amount, tokenAmount) => {
     tradeInDB.error = true;
     tradeInDB.success = false;
     await tradeInDB.save();
+
+    await sendMessage("Error on token sell", msg);
   }
 };
 
