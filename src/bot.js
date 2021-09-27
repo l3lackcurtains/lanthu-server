@@ -2,6 +2,7 @@ const { TradeModal, BUSD, TokenModal, LogModal } = require("./common/db");
 const { provider, chainID } = require("./common/wallet");
 const { Fetcher, Route, Token } = require("@pancakeswap/sdk");
 const { buyToken, sellToken } = require("./trade");
+const { sendMessage } = require("./notification");
 
 const startTheBot = async () => {
   const trades = await TradeModal.find();
@@ -57,6 +58,8 @@ const startTheBot = async () => {
       tradeInDB.error = true;
       tradeInDB.success = false;
       await tradeInDB.save();
+
+      await sendMessage("Error on token parse!", msg);
     }
   }
 };
