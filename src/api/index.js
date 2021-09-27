@@ -1,6 +1,11 @@
 require("dotenv").config();
 const express = require("express");
-const { TokenModal, TradeModal, DeviceModal } = require("../common/db");
+const {
+  TokenModal,
+  TradeModal,
+  DeviceModal,
+  LogModal,
+} = require("../common/db");
 const router = express.Router();
 
 router.post("/devices", async (req, res) => {
@@ -199,6 +204,28 @@ router.delete("/trades/:id", async (req, res) => {
     }
   } catch (e) {
     res.json({ success: false, message: `Error on trade remove.` });
+  }
+});
+
+router.delete("/logs/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const logInDB = await LogModal.findOne({ id });
+    if (logInDB !== null) {
+      await LogModal.deleteOne({ id });
+      res.json({ success: true, message: `Log removed` });
+    }
+  } catch (e) {
+    res.json({ success: false, message: `Error on token remove.` });
+  }
+});
+
+router.get("/logs", async (req, res) => {
+  try {
+    const logs = await LogModal.find();
+    res.json({ success: true, message: logs });
+  } catch (e) {
+    res.json({ success: false, message: `Error on logs fetch.` });
   }
 });
 
