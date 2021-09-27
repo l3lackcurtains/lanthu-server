@@ -22,6 +22,16 @@ router.post("/devices", async (req, res) => {
   }
 });
 
+router.get("/devices/:token", async (req, res) => {
+  const token = req.params.token;
+  try {
+    const device = await DeviceModal.findOne({ token });
+    res.json({ success: true, message: device });
+  } catch (e) {
+    res.json({ success: false, message: `Error on device add.` });
+  }
+});
+
 router.post("/tokens", async (req, res) => {
   const name = req.body.name;
   const address = req.body.address;
@@ -51,10 +61,8 @@ router.post("/tokens", async (req, res) => {
   }
 });
 
-router.put("/tokens/:id", async (req, res) => {
-  const id = req.params.id;
-
-  const name = req.body.name;
+router.put("/tokens/:name", async (req, res) => {
+  const name = req.params.name;
   const address = req.body.address;
   const slug = req.body.slug;
 
