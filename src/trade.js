@@ -1,5 +1,4 @@
 const {
-  ChainId,
   Fetcher,
   Percent,
   Route,
@@ -7,23 +6,26 @@ const {
   TokenAmount,
   Trade,
   TradeType,
-} = require("@uniswap/sdk");
+} = require("@pancakeswap/sdk");
 
 const { ethers } = require("ethers");
 const { parseEther, formatEther } = require("ethers/lib/utils");
 const tokenABI = require("./abi/token.json");
-const { BUSD, TradeModal } = require("./db");
-
-const GWEI = 1000 * 1000 * 1000;
+const { BUSD, TradeModal, LogModal } = require("./common/db");
 
 const {
   provider,
   wallet,
   pancakeSwapContract,
   pancakeSwapContractAddress,
-} = require("./wallet");
+  chainID,
+  maxAllowance,
+  gasLimit,
+  slippage,
+  GWEI,
+} = require("./common/wallet");
 
-const buyToken = async (trade, amount) => {
+const buyToken = async (trade, coin, amount, tokenAmount) => {
   try {
     const amountOut = parseEther(amount.toString());
 
@@ -39,10 +41,9 @@ const buyToken = async (trade, amount) => {
     if (allowance.lte(amountOut)) {
       const approved = await tokenContract.approve(
         pancakeSwapContractAddress,
-        "1000000000000000000000000",
+        new ethers.BigNumber.from(maxAllowance),
         {
-          gasPrice: 10 * GWEI,
-          gasLimit: 6738966,
+          gasLimit: gasLimit,
         }
       );
 
@@ -61,7 +62,7 @@ const buyToken = async (trade, amount) => {
       return;
     }
 
-    const TOKEN = new Token(ChainId.ROPSTEN, trade.address, 18, trade.token);
+    const TOKEN = new Token(chainID, coin.address, 18, coin.name);
 
     const pair = await Fetcher.fetchPairData(BUSD, TOKEN, provider);
 
@@ -73,7 +74,7 @@ const buyToken = async (trade, amount) => {
       TradeType.EXACT_INPUT
     );
 
-    const slippageTolerance = new Percent("2", "100");
+    const slippageTolerance = new Percent(slippage.toString(), "100");
 
     const amountOutMin = tradeData.minimumAmountOut(slippageTolerance).raw;
 
@@ -94,29 +95,39 @@ const buyToken = async (trade, amount) => {
       to,
       deadline,
       {
-        gasLimit: 5000000,
+        gasLimit: gasLimit,
       }
     );
 
     await bought.wait();
 
-    await TradeModal.deleteOne({ id: trade.id });
+    const tradeInDB = await TradeModal.findOne({ id: trade.id });
+    tradeInDB.error = false;
+    tradeInDB.success = true;
+    await tradeInDB.save();
 
     console.log(`Buy completed.`);
   } catch (e) {
-    console.log("Error on token buy!");
+    const msg = `Error on token buy! ${coin.name}: ${trade.amount} USD @ ${trade.limit} USD (${tokenAmount} ${coin.name})}`;
+    const newLog = new LogModal({ message: msg, details: e.toString() });
+    newLog.save();
+    console.log(msg);
     console.log(e);
-    await TradeModal.deleteOne({ id: trade.id });
+
+    const tradeInDB = await TradeModal.findOne({ id: trade.id });
+    tradeInDB.error = true;
+    tradeInDB.success = false;
+    await tradeInDB.save();
   }
 };
 
-const sellToken = async (trade, amount, tokenAmount) => {
+const sellToken = async (trade, coin, amount, tokenAmount) => {
   try {
     const amountIn = parseEther(amount.toString());
 
     const to = wallet.address;
 
-    const tokenContract = new ethers.Contract(trade.address, tokenABI, wallet);
+    const tokenContract = new ethers.Contract(coin.address, tokenABI, wallet);
 
     const allowance = await tokenContract.allowance(
       to,
@@ -126,9 +137,10 @@ const sellToken = async (trade, amount, tokenAmount) => {
     if (allowance.lte(amountIn)) {
       const approved = await tokenContract.approve(
         pancakeSwapContractAddress,
-        "1000000000000000000000000",
+        new ethers.BigNumber.from(maxAllowance),
         {
-          gasLimit: 8500000,
+          gasPrice: 10 * GWEI,
+          gasLimit: gasLimit,
         }
       );
 
@@ -149,7 +161,7 @@ const sellToken = async (trade, amount, tokenAmount) => {
       return;
     }
 
-    const TOKEN = new Token(ChainId.ROPSTEN, trade.address, 18, trade.token);
+    const TOKEN = new Token(chainID, coin.address, 18, coin.name);
 
     const pair = await Fetcher.fetchPairData(TOKEN, BUSD, provider);
 
@@ -161,7 +173,7 @@ const sellToken = async (trade, amount, tokenAmount) => {
       TradeType.EXACT_OUTPUT
     );
 
-    const slippageTolerance = new Percent("2", "100");
+    const slippageTolerance = new Percent(slippage.toString(), "100");
 
     const amountInMax = tradeData.maximumAmountIn(slippageTolerance).raw;
 
@@ -182,19 +194,29 @@ const sellToken = async (trade, amount, tokenAmount) => {
       to,
       deadline,
       {
-        gasLimit: 6700000,
+        gasLimit: gasLimit,
       }
     );
 
     await sold.wait();
 
-    await TradeModal.deleteOne({ id: trade.id });
+    const tradeInDB = await TradeModal.findOne({ id: trade.id });
+    tradeInDB.error = false;
+    tradeInDB.success = true;
+    await tradeInDB.save();
 
     console.log(`Sell completed.`);
   } catch (e) {
-    console.log("Error on token sell!");
+    const msg = `Error on token sell! ${coin.name}: ${coin.address}`;
+    const newLog = new LogModal({ message: msg, details: e.toString() });
+    newLog.save();
     console.log(e);
-    await TradeModal.deleteOne({ id: trade.id });
+    console.log(msg);
+
+    const tradeInDB = await TradeModal.findOne({ id: trade.id });
+    tradeInDB.error = true;
+    tradeInDB.success = false;
+    await tradeInDB.save();
   }
 };
 

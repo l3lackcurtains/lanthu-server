@@ -1,6 +1,6 @@
 const Discord = require("discord.js");
 require("dotenv").config();
-const { TokenModal, TradeModal } = require("./db");
+const { TokenModal, TradeModal } = require("../common/db");
 const dBot = new Discord.Client();
 
 dBot.login(process.env.BOT_API);
