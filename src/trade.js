@@ -12,6 +12,7 @@ const { ethers } = require("ethers");
 const { parseEther, formatEther } = require("ethers/lib/utils");
 const tokenABI = require("./abi/token.json");
 const { BUSD, TradeModal, LogModal } = require("./common/db");
+const { sendMessage } = require("./notification");
 
 const {
   provider,
