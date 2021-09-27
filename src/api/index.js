@@ -8,7 +8,7 @@ router.post("/devices", async (req, res) => {
   try {
     const deviceInDB = await DeviceModal.findOne({ token });
     if (deviceInDB === null) {
-      const newDevice = new DeviceModal({ device });
+      const newDevice = new DeviceModal({ token });
       newDevice.save();
       res.json({ success: true, message: `Device added` });
     }
