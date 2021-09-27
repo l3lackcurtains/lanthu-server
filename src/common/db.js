@@ -66,6 +66,12 @@ const logSchema = new Schema({
 
 const LogModal = mongoose.model("Log", logSchema);
 
+const deviceSchema = new Schema({
+  token: String,
+});
+
+const DeviceModal = mongoose.model("Device", deviceSchema);
+
 const BUSD = new Token(
   chainID,
   "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
@@ -74,4 +80,11 @@ const BUSD = new Token(
   "BUSD"
 );
 
-module.exports = { BUSD, TradeModal, TokenModal, LogModal, startDB };
+module.exports = {
+  BUSD,
+  TradeModal,
+  TokenModal,
+  LogModal,
+  startDB,
+  DeviceModal,
+};

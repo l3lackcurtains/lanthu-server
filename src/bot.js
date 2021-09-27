@@ -21,7 +21,6 @@ const startTheBot = async () => {
       const route = new Route([pair], TOKEN);
 
       const currentPrice = route.midPrice.toSignificant(6);
-      console.log(`Current ${TOKEN.symbol} Price: ${currentPrice}`);
 
       if (
         trade.type === "BUY" &&

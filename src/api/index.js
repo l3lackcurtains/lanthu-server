@@ -1,7 +1,21 @@
 require("dotenv").config();
 const express = require("express");
-const { TokenModal, TradeModal } = require("../common/db");
+const { TokenModal, TradeModal, DeviceModal } = require("../common/db");
 const router = express.Router();
+
+router.post("/devices", async (req, res) => {
+  const token = req.body.token;
+  try {
+    const deviceInDB = await DeviceModal.findOne({ token });
+    if (deviceInDB === null) {
+      const newDevice = new DeviceModal({ device });
+      newDevice.save();
+      res.json({ success: true, message: `Device added` });
+    }
+  } catch (e) {
+    res.json({ success: false, message: `Error on device add.` });
+  }
+});
 
 router.post("/tokens", async (req, res) => {
   const name = req.body.name;
