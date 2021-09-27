@@ -22,14 +22,13 @@ app.use("/", express.static(path.join(__dirname, "public")));
 
 app.use("/", router);
 
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`App listening at http://localhost:${port}`);
-  runBot();
+  await startDB();
+  await runBot();
 });
 
 const runBot = async () => {
-  await startDB();
-
   while (1) {
     await startTheBot();
   }
