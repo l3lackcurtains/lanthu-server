@@ -28,7 +28,7 @@ router.get("/devices/:token", async (req, res) => {
     const device = await DeviceModal.findOne({ token });
     res.json({ success: true, message: device });
   } catch (e) {
-    res.json({ success: false, message: `Error on device add.` });
+    res.json({ success: false, message: `Error on device fetch.` });
   }
 });
 
@@ -216,11 +216,11 @@ router.delete("/trades/:id", async (req, res) => {
 });
 
 router.delete("/logs/:id", async (req, res) => {
-  const id = req.params.id;
+  const id = req.params.id.toString();
   try {
-    const logInDB = await LogModal.findOne({ id });
+    const logInDB = await LogModal.findOne({ _id: id });
     if (logInDB !== null) {
-      await LogModal.deleteOne({ id });
+      await LogModal.deleteOne({ _id: id });
       res.json({ success: true, message: `Log removed` });
     }
   } catch (e) {
