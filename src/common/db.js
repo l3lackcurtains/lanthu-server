@@ -37,7 +37,10 @@ const Schema = mongoose.Schema;
 
 const tradeSchema = new Schema(
   {
-    id: Number,
+    id: {
+      type: Number,
+      unique: true, // `email` must be unique
+    },
     type: {
       type: String,
       enum: ["BUY", "SELL"],
@@ -58,7 +61,10 @@ const TradeModal = mongoose.model("Trade", tradeSchema);
 
 const tokenSchema = new Schema(
   {
-    name: String,
+    name: {
+      type: String,
+      unique: true, // `email` must be unique
+    },
     address: String,
     slug: String,
   },
