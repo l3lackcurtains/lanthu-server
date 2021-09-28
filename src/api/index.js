@@ -43,19 +43,9 @@ router.post("/tokens", async (req, res) => {
   }
 
   try {
-    const coinInDB = await TokenModal.findOne({ name });
-
-    if (coinInDB !== null) {
-      coinInDB.name = name;
-      coinInDB.address = address;
-      coinInDB.slug = slug;
-      coinInDB.save();
-      res.json({ success: true, message: `Token updated.` });
-    } else {
-      const newToken = new TokenModal({ name, address });
-      newToken.save();
-      res.json({ success: true, message: `Token added` });
-    }
+    const newToken = new TokenModal({ name, address, slug });
+    newToken.save();
+    res.json({ success: true, message: `Token added` });
   } catch (e) {
     res.json({ success: false, message: `Error on token add.` });
   }
@@ -85,9 +75,7 @@ router.put("/tokens/:name", async (req, res) => {
       );
       res.json({ success: true, message: `Token updated.` });
     } else {
-      const newToken = new TokenModal({ name, address });
-      newToken.save();
-      res.json({ success: true, message: `Token added` });
+      res.json({ success: false, message: `Token name doesnt exists.` });
     }
   } catch (e) {
     res.json({ success: false, message: `Error on token add.` });
@@ -110,7 +98,7 @@ router.delete("/tokens/:name", async (req, res) => {
 
 router.get("/tokens", async (req, res) => {
   try {
-    const tokens = await TokenModal.find();
+    const tokens = await TokenModal.find().sort({ updatedAt: -1 });
     res.json({ success: true, message: tokens });
   } catch (e) {
     res.json({ success: false, message: `Error on tokens fetch.` });
