@@ -182,7 +182,7 @@ router.put("/trades/:id", async (req, res) => {
 
 router.get("/trades", async (req, res) => {
   try {
-    const trades = await TradeModal.find();
+    const trades = await TradeModal.find().sort({ updatedAt: -1 });
     res.json({ success: true, message: trades });
   } catch (e) {
     res.json({ success: false, message: `Error on trades fetch.` });
@@ -218,7 +218,7 @@ router.delete("/logs/:id", async (req, res) => {
 
 router.get("/logs", async (req, res) => {
   try {
-    const logs = await LogModal.find();
+    const logs = await LogModal.find().sort({ updatedAt: -1 });
     res.json({ success: true, message: logs });
   } catch (e) {
     res.json({ success: false, message: `Error on logs fetch.` });
