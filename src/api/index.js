@@ -1,11 +1,18 @@
 require("dotenv").config();
+const { formatEther } = require("@ethersproject/units");
+const { Route, Token, Fetcher } = require("@pancakeswap/sdk");
+const { ethers } = require("ethers");
 const express = require("express");
+
+const tokenABI = require("../abi/token.json");
 const {
   TokenModal,
   TradeModal,
   DeviceModal,
   LogModal,
+  BUSD,
 } = require("../common/db");
+const { wallet, chainID, provider } = require("../common/wallet");
 const router = express.Router();
 
 router.post("/devices", async (req, res) => {
@@ -101,11 +108,41 @@ router.get("/tokens", async (req, res) => {
 });
 
 router.get("/tokens/:name", async (req, res) => {
-  const name = req.params.name;
+  const name = req.params.name.toUpperCase();
+
   try {
     const token = await TokenModal.findOne({ name });
-    res.json({ success: true, message: token });
+
+    if (token !== null) {
+      const tokenContract = new ethers.Contract(
+        token.address,
+        tokenABI,
+        wallet
+      );
+      const balance = await tokenContract.balanceOf(wallet.address);
+
+      const TOKEN = new Token(chainID, token.address, 18, token.name);
+
+      const pair = await Fetcher.fetchPairData(BUSD, TOKEN, provider);
+
+      const route = new Route([pair], TOKEN);
+
+      const price = route.midPrice.toSignificant(8);
+
+      const data = {
+        token: token.name,
+        address: token.address,
+        slug: token.slug,
+        balance: parseFloat(formatEther(balance)).toFixed(8),
+        price: parseFloat(price).toFixed(8),
+      };
+
+      res.json({ success: true, message: data });
+    } else {
+      res.json({ success: false, message: "No token." });
+    }
   } catch (e) {
+    console.log(e);
     res.json({ success: false, message: `Error on token fetch.` });
   }
 });

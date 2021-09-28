@@ -20,15 +20,15 @@ const startTheBot = async () => {
 
       const route = new Route([pair], TOKEN);
 
-      const currentPrice = route.midPrice.toSignificant(6);
+      const currentPrice = route.midPrice.toSignificant(8);
 
       if (
         trade.type === "BUY" &&
         trade.limit > 0 &&
         currentPrice < trade.limit
       ) {
-        const amountUSD = parseFloat(trade.amount).toFixed(8);
-        const tokenAmount = parseFloat(trade.amount / currentPrice).toFixed(8);
+        const tokenAmount = parseFloat(trade.amount).toFixed(18);
+        const amountUSD = parseFloat(trade.amount * currentPrice).toFixed(18);
         console.log(
           `Start buying ${tokenAmount} ${TOKEN.symbol} (${amountUSD} USD) `
         );
@@ -38,8 +38,8 @@ const startTheBot = async () => {
         trade.limit > 0 &&
         currentPrice > trade.limit
       ) {
-        const amountUSD = parseFloat(trade.amount).toFixed(8);
-        const tokenAmount = parseFloat(trade.amount / currentPrice).toFixed(8);
+        const tokenAmount = parseFloat(trade.amount).toFixed(18);
+        const amountUSD = parseFloat(trade.amount * currentPrice).toFixed(18);
         console.log(
           `Start selling ${tokenAmount} ${TOKEN.symbol} (${amountUSD} USD) `
         );
