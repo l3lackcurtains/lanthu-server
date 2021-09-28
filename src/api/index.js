@@ -15,6 +15,24 @@ const {
 const { wallet, chainID, provider } = require("../common/wallet");
 const router = express.Router();
 
+const getTokenPriceAndBalance = async (token) => {
+  const tokenContract = new ethers.Contract(token.address, tokenABI, wallet);
+  const balance = await tokenContract.balanceOf(wallet.address);
+
+  const TOKEN = new Token(chainID, token.address, 18, token.name);
+
+  const pair = await Fetcher.fetchPairData(BUSD, TOKEN, provider);
+
+  const route = new Route([pair], TOKEN);
+
+  const price = route.midPrice.toSignificant(8);
+
+  return {
+    balance: parseFloat(formatEther(balance)).toFixed(8),
+    price: parseFloat(price).toFixed(8),
+  };
+};
+
 router.post("/devices", async (req, res) => {
   const token = req.body.token;
   try {
@@ -101,8 +119,10 @@ router.delete("/tokens/:name", async (req, res) => {
 router.get("/tokens", async (req, res) => {
   try {
     const tokens = await TokenModal.find().sort({ updatedAt: -1 });
+
     res.json({ success: true, message: tokens });
   } catch (e) {
+    console.log(e);
     res.json({ success: false, message: `Error on tokens fetch.` });
   }
 });
@@ -114,27 +134,14 @@ router.get("/tokens/:name", async (req, res) => {
     const token = await TokenModal.findOne({ name });
 
     if (token !== null) {
-      const tokenContract = new ethers.Contract(
-        token.address,
-        tokenABI,
-        wallet
-      );
-      const balance = await tokenContract.balanceOf(wallet.address);
-
-      const TOKEN = new Token(chainID, token.address, 18, token.name);
-
-      const pair = await Fetcher.fetchPairData(BUSD, TOKEN, provider);
-
-      const route = new Route([pair], TOKEN);
-
-      const price = route.midPrice.toSignificant(8);
+      const { balance, price } = await getTokenPriceAndBalance(token);
 
       const data = {
         token: token.name,
         address: token.address,
         slug: token.slug,
-        balance: parseFloat(formatEther(balance)).toFixed(8),
-        price: parseFloat(price).toFixed(8),
+        balance,
+        price,
       };
 
       res.json({ success: true, message: data });
