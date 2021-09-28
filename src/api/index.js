@@ -17,7 +17,11 @@ const router = express.Router();
 
 const getTokenPriceAndBalance = async (token) => {
   const tokenContract = new ethers.Contract(token.address, tokenABI, wallet);
+
   const balance = await tokenContract.balanceOf(wallet.address);
+
+  const busdContract = new ethers.Contract(BUSD.address, tokenABI, wallet);
+  const busdBalance = await busdContract.balanceOf(wallet.address);
 
   const TOKEN = new Token(chainID, token.address, 18, token.name);
 
@@ -30,6 +34,7 @@ const getTokenPriceAndBalance = async (token) => {
   return {
     balance: parseFloat(formatEther(balance)).toFixed(8),
     price: parseFloat(price).toFixed(8),
+    busdBalance: parseFloat(formatEther(busdBalance)).toFixed(8),
   };
 };
 
@@ -151,12 +156,15 @@ router.get("/tokeninfo/:name", async (req, res) => {
     const token = await TokenModal.findOne({ name });
 
     if (token !== null) {
-      const { balance, price } = await getTokenPriceAndBalance(token);
+      const { balance, price, busdBalance } = await getTokenPriceAndBalance(
+        token
+      );
 
       const data = {
         token: token.name,
         address: token.address,
         balance,
+        busdBalance,
         price,
       };
 
