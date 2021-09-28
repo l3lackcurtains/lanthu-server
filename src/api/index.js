@@ -62,11 +62,11 @@ router.put("/tokens/:name", async (req, res) => {
   }
 
   try {
-    const coinInDB = await TokenModal.findOne({ name });
+    const tokenDb = await TokenModal.findOne({ name });
 
-    if (coinInDB !== null) {
+    if (tokenDb !== null) {
       await TradeModal.updateOne(
-        { id },
+        { name },
         {
           name: name,
           address: address,
@@ -86,8 +86,8 @@ router.delete("/tokens/:name", async (req, res) => {
   const name = req.params.name.toUpperCase();
 
   try {
-    const coinInDB = await TokenModal.findOne({ name });
-    if (coinInDB !== null) {
+    const tokenDb = await TokenModal.findOne({ name });
+    if (tokenDb !== null) {
       await TokenModal.deleteOne({ name });
       res.json({ success: true, message: `Token removed` });
     }
@@ -124,12 +124,12 @@ router.post("/trades", async (req, res) => {
   const error = req.body.error;
 
   try {
-    const coinInDB = await TokenModal.findOne({ name: token });
-    if (coinInDB !== null) {
+    const tokenDb = await TokenModal.findOne({ name: token });
+    if (tokenDb !== null) {
       const newTrade = TradeModal({
         id: Math.floor(Math.random() * 99999),
         type: type,
-        address: coinInDB.address,
+        address: tokenDb.address,
         token: token,
         amount: amount,
         limit: limit,
@@ -156,8 +156,8 @@ router.put("/trades/:id", async (req, res) => {
   const error = req.body.error;
 
   try {
-    const coinInDB = await TokenModal.findOne({ name: token });
-    if (coinInDB !== null) {
+    const tokenDb = await TokenModal.findOne({ name: token });
+    if (tokenDb !== null) {
       await TradeModal.updateOne(
         { id },
         {
