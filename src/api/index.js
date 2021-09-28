@@ -134,12 +134,28 @@ router.get("/tokens/:name", async (req, res) => {
     const token = await TokenModal.findOne({ name });
 
     if (token !== null) {
+      res.json({ success: true, message: token });
+    } else {
+      res.json({ success: false, message: "No token." });
+    }
+  } catch (e) {
+    console.log(e);
+    res.json({ success: false, message: `Error on token fetch.` });
+  }
+});
+
+router.get("/tokeninfo/:name", async (req, res) => {
+  const name = req.params.name.toUpperCase();
+
+  try {
+    const token = await TokenModal.findOne({ name });
+
+    if (token !== null) {
       const { balance, price } = await getTokenPriceAndBalance(token);
 
       const data = {
         token: token.name,
         address: token.address,
-        slug: token.slug,
         balance,
         price,
       };
