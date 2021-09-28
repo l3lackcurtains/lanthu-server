@@ -35,40 +35,60 @@ const startDB = async () => {
 
 const Schema = mongoose.Schema;
 
-const tradeSchema = new Schema({
-  id: Number,
-  type: {
-    type: String,
-    enum: ["BUY", "SELL"],
-    default: "BUY",
+const tradeSchema = new Schema(
+  {
+    id: Number,
+    type: {
+      type: String,
+      enum: ["BUY", "SELL"],
+      default: "BUY",
+    },
+    token: String,
+    amount: Number,
+    limit: Number,
+    success: Boolean,
+    error: Boolean,
   },
-  token: String,
-  amount: Number,
-  limit: Number,
-  success: Boolean,
-  error: Boolean,
-});
+  {
+    timestamps: true,
+  }
+);
 
 const TradeModal = mongoose.model("Trade", tradeSchema);
 
-const tokenSchema = new Schema({
-  name: String,
-  address: String,
-  slug: String,
-});
+const tokenSchema = new Schema(
+  {
+    name: String,
+    address: String,
+    slug: String,
+  },
+  {
+    timestamps: true,
+  }
+);
 
 const TokenModal = mongoose.model("Token", tokenSchema);
 
-const logSchema = new Schema({
-  message: String,
-  details: String,
-});
+const logSchema = new Schema(
+  {
+    message: String,
+    details: String,
+  },
+  {
+    timestamps: true,
+  }
+);
 
 const LogModal = mongoose.model("Log", logSchema);
 
-const deviceSchema = new Schema({
-  token: String,
-});
+const deviceSchema = new Schema(
+  {
+    token: String,
+  },
+  {
+    timestamps: true,
+  }
+);
 
 const DeviceModal = mongoose.model("Device", deviceSchema);
 
