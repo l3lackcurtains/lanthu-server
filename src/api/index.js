@@ -55,6 +55,7 @@ router.put("/tokens/:name", async (req, res) => {
   const name = req.params.name;
   const address = req.body.address;
   const slug = req.body.slug;
+  const newName = req.body.name;
 
   if (address.length !== 42 || address.substr(0, 2) !== "0x") {
     res.json({ success: false, message: `Address wrong.` });
@@ -62,21 +63,15 @@ router.put("/tokens/:name", async (req, res) => {
   }
 
   try {
-    const tokenDb = await TokenModal.findOne({ name });
-
-    if (tokenDb !== null) {
-      await TradeModal.updateOne(
-        { name },
-        {
-          name: name,
-          address: address,
-          slug: slug,
-        }
-      );
-      res.json({ success: true, message: `Token updated.` });
-    } else {
-      res.json({ success: false, message: `Token name doesnt exists.` });
-    }
+    await TokenModal.updateOne(
+      { name },
+      {
+        name: newName,
+        address: address,
+        slug: slug,
+      }
+    );
+    res.json({ success: true, message: `Token updated.` });
   } catch (e) {
     res.json({ success: false, message: `Error on token add.` });
   }
