@@ -46,17 +46,20 @@ const startTheBot = async () => {
         await sellToken(trade, coin, amountUSD, tokenAmount);
       }
     } catch (e) {
-      const msg = `Error on token parse! ${coin.name}: ${coin.address}`;
-      const newLog = new LogModal({ message: msg, details: e.toString() });
-      newLog.save();
+      const errStr = e.toString();
+      if (errStr.includes("getReserves()")) {
+        const msg = `No token pair found for ${coin.name}.`;
+        const newLog = new LogModal({ message: msg, details: e.toString() });
+        newLog.save();
 
-      console.log(e);
-      console.log(msg);
+        console.log(e);
+        console.log(msg);
 
-      const tradeInDB = await TradeModal.findOne({ id: trade.id });
-      tradeInDB.error = true;
-      tradeInDB.success = false;
-      await tradeInDB.save();
+        const tradeInDB = await TradeModal.findOne({ id: trade.id });
+        tradeInDB.error = true;
+        tradeInDB.success = false;
+        await tradeInDB.save();
+      }
     }
   }
 };

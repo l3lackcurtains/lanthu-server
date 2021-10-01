@@ -26,9 +26,9 @@ const {
   GWEI,
 } = require("./common/wallet");
 
-const buyToken = async (trade, coin, amount, tokenAmount) => {
+const buyToken = async (trade, coin, amountUSD, tokenAmount) => {
   try {
-    const amountOut = parseEther(amount.toString());
+    const amountOut = parseEther(amountUSD.toString());
 
     const to = wallet.address;
 
@@ -106,13 +106,16 @@ const buyToken = async (trade, coin, amount, tokenAmount) => {
     tradeInDB.error = false;
     tradeInDB.success = true;
     await tradeInDB.save();
-    console.log(`Token Buy completed.`);
-    const msg = `${coin.name}: ${trade.amount} USD @ ${trade.limit} USD (${tokenAmount} ${coin.name})}`;
+
+    const msg = `Bought ${tokenAmount} ${coin.name} (${amountUSD} USD) at ${trade.limit} ${coin.name})}`;
+    console.log(msg);
     await sendMessage("Token Buy completed!", msg);
   } catch (e) {
-    const msg = `Error on token buy! ${coin.name}: ${trade.amount} USD @ ${trade.limit} USD (${tokenAmount} ${coin.name})}`;
+    const msg = `Error on token buy! ${tokenAmount} ${coin.name} (${amountUSD} USD) at ${trade.limit} ${coin.name})}`;
+
     const newLog = new LogModal({ message: msg, details: e.toString() });
     newLog.save();
+
     console.log(msg);
     console.log(e);
 
@@ -125,9 +128,9 @@ const buyToken = async (trade, coin, amount, tokenAmount) => {
   }
 };
 
-const sellToken = async (trade, coin, amount, tokenAmount) => {
+const sellToken = async (trade, coin, amountUSD, tokenAmount) => {
   try {
-    const amountIn = parseEther(amount.toString());
+    const amountIn = parseEther(amountUSD.toString());
 
     const to = wallet.address;
 
@@ -209,11 +212,11 @@ const sellToken = async (trade, coin, amount, tokenAmount) => {
     tradeInDB.success = true;
     await tradeInDB.save();
 
-    console.log(`Sell completed.`);
-    const msg = `${coin.name}: ${trade.amount} USD @ ${trade.limit} USD (${tokenAmount} ${coin.name})}`;
+    const msg = `Sold ${tokenAmount} ${coin.name} (${amountUSD} USD) at ${trade.limit} ${coin.name})}`;
+    console.log(msg);
     await sendMessage("Token Sell completed!", msg);
   } catch (e) {
-    const msg = `Error on token sell! ${coin.name}: ${trade.amount} USD @ ${trade.limit} USD (${tokenAmount} ${coin.name})}`;
+    const msg = `Error on token sell! ${tokenAmount} ${coin.name} (${amountUSD} USD) at ${trade.limit} ${coin.name})}`;
     const newLog = new LogModal({ message: msg, details: e.toString() });
     newLog.save();
     console.log(e);
