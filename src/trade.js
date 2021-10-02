@@ -111,15 +111,11 @@ const buyToken = async (trade, coin, amountBNB, tokenAmount) => {
     tradeInDB.success = true;
     await tradeInDB.save();
 
-    const msg = `Bought ${tokenAmount.toFixed(4)} ${
-      coin.name
-    } at ${trade.limit.toFixed(8)} ${coin.name})}`;
+    const msg = `Bought ${tokenAmount} ${coin.name} at ${trade.limit} ${coin.name})}`;
     console.log(msg);
     await sendMessage("Token Buy completed!", msg);
   } catch (e) {
-    const msg = `Error on token buy! ${tokenAmount.toFixed(4)} ${
-      coin.name
-    } at ${trade.limit.toFixed(8)} ${coin.name})}`;
+    const msg = `Error on token buy! ${tokenAmount} ${coin.name} at ${trade.limit} ${coin.name})}`;
 
     const newLog = new LogModal({ message: msg, details: e.toString() });
     newLog.save();
@@ -219,15 +215,11 @@ const sellToken = async (trade, coin, amountBNB, tokenAmount) => {
     tradeInDB.success = true;
     await tradeInDB.save();
 
-    const msg = `Sold ${tokenAmount.toFixed(4)} ${
-      coin.name
-    } at ${trade.limit.toFixed(4)} ${coin.name})}`;
+    const msg = `Sold ${tokenAmount} ${coin.name} at ${trade.limit} ${coin.name})}`;
     console.log(msg);
     await sendMessage("Token Sell completed!", msg);
   } catch (e) {
-    const msg = `Error on token sell! ${tokenAmount.toFixed(4)} ${
-      coin.name
-    } at ${trade.limit.toFixed(4)} ${coin.name})}`;
+    const msg = `Error on token sell! ${tokenAmount} ${coin.name} at ${trade.limit} ${coin.name})}`;
     const newLog = new LogModal({ message: msg, details: e.toString() });
     newLog.save();
     console.log(e);

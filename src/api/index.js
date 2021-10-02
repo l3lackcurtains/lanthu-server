@@ -11,7 +11,7 @@ const {
   DeviceModal,
   LogModal,
 } = require("../common/db");
-const { wallet, chainID, provider } = require("../common/wallet");
+const { wallet, chainID, provider, BUSD } = require("../common/wallet");
 const router = express.Router();
 
 const getTokenPriceAndBalance = async (token) => {
@@ -28,15 +28,20 @@ const getTokenPriceAndBalance = async (token) => {
 
   const TOKEN = new Token(chainID, token.address, 18, token.name);
 
-  const pair = await Fetcher.fetchPairData(WETH[chainID], TOKEN, provider);
+  const pairBNB = await Fetcher.fetchPairData(WETH[chainID], TOKEN, provider);
+  const routeBNB = new Route([pairBNB], TOKEN);
+  const currentPriceBNB = routeBNB.midPrice.toSignificant(8);
 
-  const route = new Route([pair], TOKEN);
+  const pairBUSD = await Fetcher.fetchPairData(BUSD, WETH[chainID], provider);
+  const routeBUSD = new Route([pairBUSD], WETH[chainID]);
+  const bnbInUsd = routeBUSD.midPrice.toSignificant(8);
 
-  const price = route.midPrice.toSignificant(8);
+  const price = currentPriceBNB * bnbInUsd;
 
   return {
     balance: parseFloat(formatEther(balance)).toFixed(8),
     price: parseFloat(price).toFixed(8),
+    bnbPrice: parseFloat(bnbInUsd).toFixed(8),
     bnbBalance: parseFloat(formatEther(bnbBalance)).toFixed(8),
   };
 };
@@ -159,9 +164,8 @@ router.get("/tokeninfo/:name", async (req, res) => {
     const token = await TokenModal.findOne({ name });
 
     if (token !== null) {
-      const { balance, price, bnbBalance } = await getTokenPriceAndBalance(
-        token
-      );
+      const { balance, price, bnbBalance, bnbPrice } =
+        await getTokenPriceAndBalance(token);
 
       const data = {
         token: token.name,
@@ -169,6 +173,7 @@ router.get("/tokeninfo/:name", async (req, res) => {
         balance,
         bnbBalance,
         price,
+        bnbPrice,
       };
 
       res.json({ success: true, message: data });
