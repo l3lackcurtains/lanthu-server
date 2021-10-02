@@ -67,6 +67,11 @@ const tokenSchema = new Schema(
     },
     address: String,
     slug: String,
+    swapWith: {
+      type: String,
+      enum: ["BNB", "BUSD"],
+      default: "BNB",
+    },
   },
   {
     timestamps: true,
