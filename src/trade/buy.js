@@ -122,14 +122,14 @@ const buyToken = async (trade, coin, swapAmount, tokenAmount) => {
     tradeInDB.success = true;
     await tradeInDB.save();
 
-    const msg = `Bought ${tokenAmount} ${coin.name} at ${trade.limit} ${coin.name})}`;
+    const msg = `Bought ${tokenAmount} ${coin.name} at ${trade.limit} ${coin.name}`;
     console.log(msg);
     // Send notification
     await sendMessage("Token Buy completed!", msg);
   } catch (e) {
     // ERROR Handling
 
-    const msg = `Error on token buy! ${tokenAmount} ${coin.name} at ${trade.limit} ${coin.name})}`;
+    const msg = `Error on token buy! ${tokenAmount} ${coin.name} at ${trade.limit} ${coin.name}`;
 
     // Save the log
     const newLog = new LogModal({ message: msg, details: e.toString() });
