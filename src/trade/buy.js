@@ -28,7 +28,7 @@ const {
   BUSD,
 } = require("../common/wallet");
 
-const buyToken = async (trade, coin, swapAmount, tokenAmount) => {
+const buyToken = async (trade, coin, swapAmount, tokenAmount, currentPrice) => {
   try {
     let SWAPTOKEN = null;
     if (coin.swapWith === "BUSD") {
@@ -122,14 +122,14 @@ const buyToken = async (trade, coin, swapAmount, tokenAmount) => {
     tradeInDB.success = true;
     await tradeInDB.save();
 
-    const msg = `Bought ${tokenAmount} ${coin.name} at ${trade.limit} ${coin.name}`;
+    const msg = `Bought ${tokenAmount} ${coin.name} at ${currentPrice} ${coin.name}`;
     console.log(msg);
     // Send notification
     await sendMessage("Token Buy completed!", msg);
   } catch (e) {
     // ERROR Handling
 
-    const msg = `Error on token buy! ${tokenAmount} ${coin.name} at ${trade.limit} ${coin.name}`;
+    const msg = `Error on token buy! ${tokenAmount} ${coin.name} at ${currentPrice} ${coin.name}`;
 
     // Save the log
     const newLog = new LogModal({ message: msg, details: e.toString() });

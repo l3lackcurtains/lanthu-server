@@ -90,7 +90,7 @@ const startTheBot = async () => {
         console.log(
           `Start buying ${tokenAmount} ${TOKEN.symbol} (${swapAmount} ${coin.swapWith}) `
         );
-        await buyToken(trade, coin, swapAmount, tokenAmount);
+        await buyToken(trade, coin, swapAmount, tokenAmount, currentPrice);
       } else if (
         trade.type === "SELL" &&
         trade.limit > 0 &&
@@ -99,7 +99,7 @@ const startTheBot = async () => {
         console.log(
           `Start selling ${tokenAmount} ${TOKEN.symbol} (${swapAmount} ${coin.swapWith}) `
         );
-        await sellToken(trade, coin, swapAmount, tokenAmount);
+        await sellToken(trade, coin, swapAmount, tokenAmount, currentPrice);
       }
     } catch (e) {
       const errStr = e.toString();
