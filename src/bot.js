@@ -42,14 +42,20 @@ const startTheBot = async () => {
       // ********************************************
 
       // GET BUSD to TOKEN Price
-
-      const pairTokenBUSD = await Fetcher.fetchPairData(BUSD, TOKEN, provider);
-      const routeTokenBUSD = new Route([pairTokenBUSD], TOKEN);
-      const currentPriceTokenBUSD = routeTokenBUSD.midPrice.toSignificant(8);
-
+      let currentPriceConversion = 0;
+      if (coin.swapWith === "BUSD") {
+        const pairTokenBUSD = await Fetcher.fetchPairData(
+          BUSD,
+          TOKEN,
+          provider
+        );
+        const routeTokenBUSD = new Route([pairTokenBUSD], TOKEN);
+        const currentPriceTokenBUSD = routeTokenBUSD.midPrice.toSignificant(8);
+        currentPriceConversion = currentPriceTokenBUSD;
+      } else {
+        currentPriceConversion = currentPriceBNB;
+      }
       const tokenAmount = parseFloat(trade.amount);
-      const currentPriceConversion =
-        coin.swapWith === "BUSD" ? currentPriceTokenBUSD : currentPriceBNB;
       const swapAmount = parseFloat(trade.amount * currentPriceConversion);
 
       // ********************************************
