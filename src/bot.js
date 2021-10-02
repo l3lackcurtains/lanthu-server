@@ -1,5 +1,5 @@
-const { TradeModal, TokenModal, LogModal, BUSD } = require("./common/db");
-const { provider, chainID } = require("./common/wallet");
+const { TradeModal, TokenModal, LogModal } = require("./common/db");
+const { provider, chainID, BUSD } = require("./common/wallet");
 const { Fetcher, Route, Token, WETH } = require("@pancakeswap/sdk");
 const { buyToken, sellToken } = require("./trade");
 
@@ -51,7 +51,9 @@ const startTheBot = async () => {
           18
         );
         console.log(
-          `Start selling ${tokenAmount} ${TOKEN.symbol} (${amountBNB} BNB) `
+          `Start selling ${tokenAmount.toFixed(4)} ${
+            TOKEN.symbol
+          } (${amountBNB.toFixed(4)} BNB) `
         );
         await sellToken(trade, coin, amountBNB, tokenAmount);
       }

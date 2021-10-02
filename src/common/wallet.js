@@ -2,7 +2,6 @@ const { ChainId, Token, Route, Fetcher } = require("@pancakeswap/sdk");
 const { ethers } = require("ethers");
 require("dotenv").config();
 const tokenABI = require("../abi/token.json");
-const { BUSD } = require("./db");
 // BINANCE SMART CHAIN
 const provider = new ethers.providers.JsonRpcProvider(
   "https://bsc-dataseed.binance.org/",
@@ -36,6 +35,14 @@ const gasLimit = 6700000;
 
 const GWEI = 1000 * 1000 * 1000;
 
+const BUSD = new Token(
+  chainID,
+  "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
+  18,
+  "BUSD",
+  "BUSD"
+);
+
 module.exports = {
   provider,
   wallet,
@@ -46,4 +53,5 @@ module.exports = {
   gasLimit,
   slippage,
   GWEI,
+  BUSD,
 };
