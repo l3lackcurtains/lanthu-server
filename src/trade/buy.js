@@ -37,10 +37,7 @@ const buyToken = async (trade, coin, swapAmount, tokenAmount) => {
       SWAPTOKEN = WETH[chainID];
     }
 
-    const amountIn = ethers.utils.parseUnits(
-      swapAmount.toString(),
-      coin.decimal
-    );
+    const amountIn = ethers.utils.parseUnits(swapAmount.toString(), 18);
 
     const to = wallet.address;
 
