@@ -146,7 +146,6 @@ const sellToken = async (trade, coin, amountUSD, tokenAmount) => {
         pancakeSwapContractAddress,
         new ethers.BigNumber.from(maxAllowance),
         {
-          gasPrice: 10 * GWEI,
           gasLimit: gasLimit,
         }
       );
