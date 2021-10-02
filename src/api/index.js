@@ -1,6 +1,6 @@
 require("dotenv").config();
 const { formatEther } = require("@ethersproject/units");
-const { Route, Token, Fetcher } = require("@pancakeswap/sdk");
+const { Route, Token, Fetcher, WETH } = require("@pancakeswap/sdk");
 const { ethers } = require("ethers");
 const express = require("express");
 
@@ -10,7 +10,6 @@ const {
   TradeModal,
   DeviceModal,
   LogModal,
-  BUSD,
 } = require("../common/db");
 const { wallet, chainID, provider } = require("../common/wallet");
 const router = express.Router();
@@ -20,12 +19,12 @@ const getTokenPriceAndBalance = async (token) => {
 
   const balance = await tokenContract.balanceOf(wallet.address);
 
-  const busdContract = new ethers.Contract(BUSD.address, tokenABI, wallet);
+  const busdContract = new ethers.Contract(WETH.address, tokenABI, wallet);
   const busdBalance = await busdContract.balanceOf(wallet.address);
 
   const TOKEN = new Token(chainID, token.address, 18, token.name);
 
-  const pair = await Fetcher.fetchPairData(BUSD, TOKEN, provider);
+  const pair = await Fetcher.fetchPairData(WETH, TOKEN, provider);
 
   const route = new Route([pair], TOKEN);
 
@@ -34,7 +33,7 @@ const getTokenPriceAndBalance = async (token) => {
   return {
     balance: parseFloat(formatEther(balance)).toFixed(8),
     price: parseFloat(price).toFixed(8),
-    busdBalance: parseFloat(formatEther(busdBalance)).toFixed(8),
+    bnbBalance: parseFloat(formatEther(busdBalance)).toFixed(8),
   };
 };
 

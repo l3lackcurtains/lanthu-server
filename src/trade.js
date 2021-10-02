@@ -128,7 +128,7 @@ const buyToken = async (trade, coin, amountBNB, tokenAmount) => {
     tradeInDB.success = false;
     await tradeInDB.save();
 
-    await sendMessage("Error on token buy", msg);
+    await sendMessage("Error on token buy!", msg);
   }
 };
 
@@ -234,7 +234,7 @@ const sellToken = async (trade, coin, amountBNB, tokenAmount) => {
     tradeInDB.success = false;
     await tradeInDB.save();
 
-    await sendMessage("Error on token sell", msg);
+    await sendMessage("Error on token sell!", msg);
   }
 };
 
