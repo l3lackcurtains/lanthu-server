@@ -1,6 +1,6 @@
-const { TradeModal, BUSD, TokenModal, LogModal } = require("./common/db");
+const { TradeModal, TokenModal, LogModal } = require("./common/db");
 const { provider, chainID } = require("./common/wallet");
-const { Fetcher, Route, Token } = require("@pancakeswap/sdk");
+const { Fetcher, Route, Token, WETH } = require("@pancakeswap/sdk");
 const { buyToken, sellToken } = require("./trade");
 
 const startTheBot = async () => {
@@ -16,7 +16,7 @@ const startTheBot = async () => {
     try {
       const TOKEN = new Token(chainID, coin.address, 18, coin.name);
 
-      const pair = await Fetcher.fetchPairData(BUSD, TOKEN, provider);
+      const pair = await Fetcher.fetchPairData(WETH, TOKEN, provider);
 
       const route = new Route([pair], TOKEN);
 
@@ -28,22 +28,22 @@ const startTheBot = async () => {
         currentPrice < trade.limit
       ) {
         const tokenAmount = parseFloat(trade.amount).toFixed(18);
-        const amountUSD = parseFloat(trade.amount * currentPrice).toFixed(18);
+        const amountBNB = parseFloat(trade.amount * currentPrice).toFixed(18);
         console.log(
-          `Start buying ${tokenAmount} ${TOKEN.symbol} (${amountUSD} USD) `
+          `Start buying ${tokenAmount} ${TOKEN.symbol} (${amountBNB} BNB) `
         );
-        await buyToken(trade, coin, amountUSD, tokenAmount);
+        await buyToken(trade, coin, amountBNB, tokenAmount);
       } else if (
         trade.type === "SELL" &&
         trade.limit > 0 &&
         currentPrice > trade.limit
       ) {
         const tokenAmount = parseFloat(trade.amount).toFixed(18);
-        const amountUSD = parseFloat(trade.amount * currentPrice).toFixed(18);
+        const amountBNB = parseFloat(trade.amount * currentPrice).toFixed(18);
         console.log(
-          `Start selling ${tokenAmount} ${TOKEN.symbol} (${amountUSD} USD) `
+          `Start selling ${tokenAmount} ${TOKEN.symbol} (${amountBNB} BNB) `
         );
-        await sellToken(trade, coin, amountUSD, tokenAmount);
+        await sellToken(trade, coin, amountBNB, tokenAmount);
       }
     } catch (e) {
       const errStr = e.toString();

@@ -6,12 +6,13 @@ const {
   TokenAmount,
   Trade,
   TradeType,
+  WETH,
 } = require("@pancakeswap/sdk");
 
 const { ethers } = require("ethers");
 const { parseEther, formatEther } = require("ethers/lib/utils");
 const tokenABI = require("./abi/token.json");
-const { BUSD, TradeModal, LogModal } = require("./common/db");
+const { TradeModal, LogModal } = require("./common/db");
 const { sendMessage } = require("./notification");
 
 const {
@@ -25,13 +26,13 @@ const {
   slippage,
 } = require("./common/wallet");
 
-const buyToken = async (trade, coin, amountUSD, tokenAmount) => {
+const buyToken = async (trade, coin, amountBNB, tokenAmount) => {
   try {
-    const amountOut = parseEther(amountUSD.toString());
+    const amountOut = parseEther(amountBNB.toString());
 
     const to = wallet.address;
 
-    const tokenContract = new ethers.Contract(BUSD.address, tokenABI, wallet);
+    const tokenContract = new ethers.Contract(WETH.address, tokenABI, wallet);
 
     const allowance = await tokenContract.allowance(
       to,
@@ -64,13 +65,13 @@ const buyToken = async (trade, coin, amountUSD, tokenAmount) => {
 
     const TOKEN = new Token(chainID, coin.address, 18, coin.name);
 
-    const pair = await Fetcher.fetchPairData(BUSD, TOKEN, provider);
+    const pair = await Fetcher.fetchPairData(WETH, TOKEN, provider);
 
-    const route = new Route([pair], BUSD, TOKEN);
+    const route = new Route([pair], WETH, TOKEN);
 
     const tradeData = new Trade(
       route,
-      new TokenAmount(BUSD, amountOut),
+      new TokenAmount(WETH, amountOut),
       TradeType.EXACT_INPUT
     );
 
@@ -106,11 +107,15 @@ const buyToken = async (trade, coin, amountUSD, tokenAmount) => {
     tradeInDB.success = true;
     await tradeInDB.save();
 
-    const msg = `Bought ${tokenAmount} ${coin.name} (${amountUSD} USD) at ${trade.limit} ${coin.name})}`;
+    const msg = `Bought ${tokenAmount.toFixed(4)} ${
+      coin.name
+    } at ${trade.limit.toFixed(8)} ${coin.name})}`;
     console.log(msg);
     await sendMessage("Token Buy completed!", msg);
   } catch (e) {
-    const msg = `Error on token buy! ${tokenAmount} ${coin.name} (${amountUSD} USD) at ${trade.limit} ${coin.name})}`;
+    const msg = `Error on token buy! ${tokenAmount.toFixed(4)} ${
+      coin.name
+    } at ${trade.limit.toFixed(8)} ${coin.name})}`;
 
     const newLog = new LogModal({ message: msg, details: e.toString() });
     newLog.save();
@@ -127,9 +132,9 @@ const buyToken = async (trade, coin, amountUSD, tokenAmount) => {
   }
 };
 
-const sellToken = async (trade, coin, amountUSD, tokenAmount) => {
+const sellToken = async (trade, coin, amountBNB, tokenAmount) => {
   try {
-    const amountIn = parseEther(amountUSD.toString());
+    const amountIn = parseEther(amountBNB.toString());
 
     const to = wallet.address;
 
@@ -168,13 +173,13 @@ const sellToken = async (trade, coin, amountUSD, tokenAmount) => {
 
     const TOKEN = new Token(chainID, coin.address, 18, coin.name);
 
-    const pair = await Fetcher.fetchPairData(TOKEN, BUSD, provider);
+    const pair = await Fetcher.fetchPairData(TOKEN, WETH, provider);
 
-    const route = new Route([pair], TOKEN, BUSD);
+    const route = new Route([pair], TOKEN, WETH);
 
     const tradeData = new Trade(
       route,
-      new TokenAmount(BUSD, amountIn),
+      new TokenAmount(WETH, amountIn),
       TradeType.EXACT_OUTPUT
     );
 
@@ -210,11 +215,15 @@ const sellToken = async (trade, coin, amountUSD, tokenAmount) => {
     tradeInDB.success = true;
     await tradeInDB.save();
 
-    const msg = `Sold ${tokenAmount} ${coin.name} (${amountUSD} USD) at ${trade.limit} ${coin.name})}`;
+    const msg = `Sold ${tokenAmount.toFixed(4)} ${
+      coin.name
+    } at ${trade.limit.toFixed(4)} ${coin.name})}`;
     console.log(msg);
     await sendMessage("Token Sell completed!", msg);
   } catch (e) {
-    const msg = `Error on token sell! ${tokenAmount} ${coin.name} (${amountUSD} USD) at ${trade.limit} ${coin.name})}`;
+    const msg = `Error on token sell! ${tokenAmount.toFixed(4)} ${
+      coin.name
+    } at ${trade.limit.toFixed(4)} ${coin.name})}`;
     const newLog = new LogModal({ message: msg, details: e.toString() });
     newLog.save();
     console.log(e);
