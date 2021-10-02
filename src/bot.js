@@ -20,25 +20,39 @@ const startTheBot = async () => {
       // ********************************************
       // Get Current Price
       // ********************************************
+      let currentPrice = 0;
       // GET BNB to TOKEN Price
-      const pairBNB = await Fetcher.fetchPairData(
-        WETH[chainID],
-        TOKEN,
-        provider
-      );
-      const routeBNB = new Route([pairBNB], TOKEN);
-      const currentPriceBNB = routeBNB.midPrice.toSignificant(8);
+      if (coin.name !== "BNB") {
+        const pairBNB = await Fetcher.fetchPairData(
+          WETH[chainID],
+          TOKEN,
+          provider
+        );
+        const routeBNB = new Route([pairBNB], TOKEN);
+        const currentPriceBNB = routeBNB.midPrice.toSignificant(6);
 
-      // GET BNB to BUSD Price
-      const pairBUSD = await Fetcher.fetchPairData(
-        BUSD,
-        WETH[chainID],
-        provider
-      );
-      const routeBUSD = new Route([pairBUSD], WETH[chainID]);
-      const currentPriceBUSD = routeBUSD.midPrice.toSignificant(8);
+        // GET BNB to BUSD Price
+        const pairBUSD = await Fetcher.fetchPairData(
+          BUSD,
+          WETH[chainID],
+          provider
+        );
+        const routeBUSD = new Route([pairBUSD], WETH[chainID]);
+        const currentPriceBUSD = routeBUSD.midPrice.toSignificant(6);
 
-      const currentPrice = currentPriceBNB * currentPriceBUSD;
+        currentPrice = currentPriceBNB * currentPriceBUSD;
+      } else {
+        // GET BNB to BUSD Price
+        const pairBUSD = await Fetcher.fetchPairData(
+          BUSD,
+          WETH[chainID],
+          provider
+        );
+        const routeBUSD = new Route([pairBUSD], WETH[chainID]);
+        const currentPriceBUSD = routeBUSD.midPrice.toSignificant(6);
+
+        currentPrice = currentPriceBUSD;
+      }
       // ********************************************
 
       // GET BUSD to TOKEN Price
@@ -50,9 +64,16 @@ const startTheBot = async () => {
           provider
         );
         const routeTokenBUSD = new Route([pairTokenBUSD], TOKEN);
-        const currentPriceTokenBUSD = routeTokenBUSD.midPrice.toSignificant(8);
+        const currentPriceTokenBUSD = routeTokenBUSD.midPrice.toSignificant(6);
         currentPriceConversion = currentPriceTokenBUSD;
       } else {
+        const pairBNB = await Fetcher.fetchPairData(
+          WETH[chainID],
+          TOKEN,
+          provider
+        );
+        const routeBNB = new Route([pairBNB], TOKEN);
+        const currentPriceBNB = routeBNB.midPrice.toSignificant(6);
         currentPriceConversion = currentPriceBNB;
       }
       const tokenAmount = parseFloat(trade.amount);
@@ -61,7 +82,6 @@ const startTheBot = async () => {
       // ********************************************
       // EXECUTE Transaction
       // ********************************************
-
       if (
         trade.type === "BUY" &&
         trade.limit > 0 &&
