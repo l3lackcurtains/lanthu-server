@@ -26,14 +26,21 @@ const {
   slippage,
 } = require("./common/wallet");
 
-const buyToken = async (trade, coin, amountBNB, tokenAmount) => {
+const buyToken = async (trade, coin, amountBNB, tokenAmount, swapWith) => {
   try {
+    let SWAPTOKEN = null;
+    if (swapWith === "BUSD") {
+      SWAPTOKEN = BUSD;
+    } else {
+      SWAPTOKEN = WETH[chainID];
+    }
+
     const amountOut = parseEther(amountBNB.toString());
 
     const to = wallet.address;
 
     const tokenContract = new ethers.Contract(
-      WETH[chainID].address,
+      SWAPTOKEN.address,
       tokenABI,
       wallet
     );
@@ -69,13 +76,13 @@ const buyToken = async (trade, coin, amountBNB, tokenAmount) => {
 
     const TOKEN = new Token(chainID, coin.address, 18, coin.name);
 
-    const pair = await Fetcher.fetchPairData(WETH[chainID], TOKEN, provider);
+    const pair = await Fetcher.fetchPairData(SWAPTOKEN, TOKEN, provider);
 
-    const route = new Route([pair], WETH[chainID], TOKEN);
+    const route = new Route([pair], SWAPTOKEN, TOKEN);
 
     const tradeData = new Trade(
       route,
-      new TokenAmount(WETH[chainID], amountOut),
+      new TokenAmount(SWAPTOKEN, amountOut),
       TradeType.EXACT_INPUT
     );
 
@@ -132,8 +139,15 @@ const buyToken = async (trade, coin, amountBNB, tokenAmount) => {
   }
 };
 
-const sellToken = async (trade, coin, amountBNB, tokenAmount) => {
+const sellToken = async (trade, coin, amountBNB, tokenAmount, swapWith) => {
   try {
+    let SWAPTOKEN = null;
+    if (swapWith === "BUSD") {
+      SWAPTOKEN = BUSD;
+    } else {
+      SWAPTOKEN = WETH[chainID];
+    }
+
     const amountIn = parseEther(amountBNB.toString());
 
     const to = wallet.address;
@@ -173,13 +187,13 @@ const sellToken = async (trade, coin, amountBNB, tokenAmount) => {
 
     const TOKEN = new Token(chainID, coin.address, 18, coin.name);
 
-    const pair = await Fetcher.fetchPairData(TOKEN, WETH[chainID], provider);
+    const pair = await Fetcher.fetchPairData(TOKEN, SWAPTOKEN, provider);
 
-    const route = new Route([pair], TOKEN, WETH[chainID]);
+    const route = new Route([pair], TOKEN, SWAPTOKEN);
 
     const tradeData = new Trade(
       route,
-      new TokenAmount(WETH[chainID], amountIn),
+      new TokenAmount(SWAPTOKEN, amountIn),
       TradeType.EXACT_OUTPUT
     );
 
