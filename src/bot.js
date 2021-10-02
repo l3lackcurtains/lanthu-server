@@ -16,10 +16,6 @@ const startTheBot = async () => {
     try {
       const TOKEN = new Token(chainID, coin.address, 18, coin.name);
 
-      const pair = await Fetcher.fetchPairData(BUSD, TOKEN, provider);
-      const route = new Route([pair], TOKEN);
-      const currentPrice = route.midPrice.toSignificant(8);
-
       const pairBNB = await Fetcher.fetchPairData(
         WETH[chainID],
         TOKEN,
@@ -27,6 +23,16 @@ const startTheBot = async () => {
       );
       const routeBNB = new Route([pairBNB], TOKEN);
       const currentPriceBNB = routeBNB.midPrice.toSignificant(8);
+
+      const pairBUSD = await Fetcher.fetchPairData(
+        BUSD,
+        WETH[chainID],
+        provider
+      );
+      const routeBUSD = new Route([pairBUSD], WETH[chainID]);
+      const currentPriceBUSD = routeBUSD.midPrice.toSignificant(8);
+
+      const currentPrice = currentPriceBNB * currentPriceBUSD;
 
       if (
         trade.type === "BUY" &&
@@ -40,7 +46,7 @@ const startTheBot = async () => {
         console.log(
           `Start buying ${tokenAmount} ${TOKEN.symbol} (${amountBNB} BNB) `
         );
-        await buyToken(trade, coin, amountBNB, tokenAmount);
+        // await buyToken(trade, coin, amountBNB, tokenAmount);
       } else if (
         trade.type === "SELL" &&
         trade.limit > 0 &&
@@ -51,11 +57,9 @@ const startTheBot = async () => {
           18
         );
         console.log(
-          `Start selling ${tokenAmount.toFixed(4)} ${
-            TOKEN.symbol
-          } (${amountBNB.toFixed(4)} BNB) `
+          `Start selling ${tokenAmount} ${TOKEN.symbol} (${amountBNB} BNB) `
         );
-        await sellToken(trade, coin, amountBNB, tokenAmount);
+        // await sellToken(trade, coin, amountBNB, tokenAmount);
       }
     } catch (e) {
       const errStr = e.toString();
