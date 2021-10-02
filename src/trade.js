@@ -28,7 +28,7 @@ const {
 
 const buyToken = async (trade, coin, amountUSD, tokenAmount) => {
   try {
-    const amountOut = parseEther(amountUSD.toString());
+    const amountOut = parseEther(tokenAmount.toString());
 
     const to = wallet.address;
 
