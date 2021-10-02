@@ -25,6 +25,7 @@ const {
   gasLimit,
   slippage,
   GWEI,
+  BUSD,
 } = require("./common/wallet");
 
 const buyToken = async (trade, coin, amountBNB, tokenAmount, swapWith) => {
