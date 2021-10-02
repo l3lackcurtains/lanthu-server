@@ -19,12 +19,16 @@ const getTokenPriceAndBalance = async (token) => {
 
   const balance = await tokenContract.balanceOf(wallet.address);
 
-  const busdContract = new ethers.Contract(WETH.address, tokenABI, wallet);
-  const busdBalance = await busdContract.balanceOf(wallet.address);
+  const bnbContract = new ethers.Contract(
+    WETH[chainID].address,
+    tokenABI,
+    wallet
+  );
+  const bnbBalance = await bnbContract.balanceOf(wallet.address);
 
   const TOKEN = new Token(chainID, token.address, 18, token.name);
 
-  const pair = await Fetcher.fetchPairData(WETH, TOKEN, provider);
+  const pair = await Fetcher.fetchPairData(WETH[chainID], TOKEN, provider);
 
   const route = new Route([pair], TOKEN);
 
@@ -33,7 +37,7 @@ const getTokenPriceAndBalance = async (token) => {
   return {
     balance: parseFloat(formatEther(balance)).toFixed(8),
     price: parseFloat(price).toFixed(8),
-    bnbBalance: parseFloat(formatEther(busdBalance)).toFixed(8),
+    bnbBalance: parseFloat(formatEther(bnbBalance)).toFixed(8),
   };
 };
 
