@@ -107,6 +107,8 @@ router.put("/tokens/:name", async (req, res) => {
         name: newName,
         address: address,
         slug: slug,
+        swapWith,
+        swapWith,
       }
     );
     res.json({ success: true, message: `Token updated.` });
