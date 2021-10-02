@@ -26,6 +26,9 @@ const getTokenPriceAndBalance = async (token) => {
   );
   const bnbBalance = await bnbContract.balanceOf(wallet.address);
 
+  const busdContract = new ethers.Contract(BUSD.address, tokenABI, wallet);
+  const busdBalance = await busdContract.balanceOf(wallet.address);
+
   const TOKEN = new Token(chainID, token.address, 18, token.name);
 
   const pairBNB = await Fetcher.fetchPairData(WETH[chainID], TOKEN, provider);
@@ -43,6 +46,7 @@ const getTokenPriceAndBalance = async (token) => {
     price: parseFloat(price).toFixed(8),
     bnbPrice: parseFloat(bnbInUsd).toFixed(8),
     bnbBalance: parseFloat(formatEther(bnbBalance)).toFixed(8),
+    busdBalance: parseFloat(formatEther(busdBalance)).toFixed(8),
   };
 };
 
@@ -166,7 +170,7 @@ router.get("/tokeninfo/:name", async (req, res) => {
     const token = await TokenModal.findOne({ name });
 
     if (token !== null) {
-      const { balance, price, bnbBalance, bnbPrice } =
+      const { balance, price, bnbBalance, bnbPrice, busdBalance } =
         await getTokenPriceAndBalance(token);
 
       const data = {
@@ -174,6 +178,7 @@ router.get("/tokeninfo/:name", async (req, res) => {
         address: token.address,
         balance,
         bnbBalance,
+        busdBalance,
         price,
         bnbPrice,
       };
