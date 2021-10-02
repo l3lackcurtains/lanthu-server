@@ -32,7 +32,11 @@ const buyToken = async (trade, coin, amountBNB, tokenAmount) => {
 
     const to = wallet.address;
 
-    const tokenContract = new ethers.Contract(WETH.address, tokenABI, wallet);
+    const tokenContract = new ethers.Contract(
+      WETH[chainID].address,
+      tokenABI,
+      wallet
+    );
 
     const allowance = await tokenContract.allowance(
       to,
@@ -65,13 +69,13 @@ const buyToken = async (trade, coin, amountBNB, tokenAmount) => {
 
     const TOKEN = new Token(chainID, coin.address, 18, coin.name);
 
-    const pair = await Fetcher.fetchPairData(WETH, TOKEN, provider);
+    const pair = await Fetcher.fetchPairData(WETH[chainID], TOKEN, provider);
 
-    const route = new Route([pair], WETH, TOKEN);
+    const route = new Route([pair], WETH[chainID], TOKEN);
 
     const tradeData = new Trade(
       route,
-      new TokenAmount(WETH, amountOut),
+      new TokenAmount(WETH[chainID], amountOut),
       TradeType.EXACT_INPUT
     );
 
@@ -173,13 +177,13 @@ const sellToken = async (trade, coin, amountBNB, tokenAmount) => {
 
     const TOKEN = new Token(chainID, coin.address, 18, coin.name);
 
-    const pair = await Fetcher.fetchPairData(TOKEN, WETH, provider);
+    const pair = await Fetcher.fetchPairData(TOKEN, WETH[chainID], provider);
 
-    const route = new Route([pair], TOKEN, WETH);
+    const route = new Route([pair], TOKEN, WETH[chainID]);
 
     const tradeData = new Trade(
       route,
-      new TokenAmount(WETH, amountIn),
+      new TokenAmount(WETH[chainID], amountIn),
       TradeType.EXACT_OUTPUT
     );
 

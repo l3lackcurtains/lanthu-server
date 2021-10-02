@@ -98,16 +98,7 @@ const deviceSchema = new Schema(
 
 const DeviceModal = mongoose.model("Device", deviceSchema);
 
-const BUSD = new Token(
-  chainID,
-  "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
-  18,
-  "BUSD",
-  "BUSD"
-);
-
 module.exports = {
-  BUSD,
   TradeModal,
   TokenModal,
   LogModal,
