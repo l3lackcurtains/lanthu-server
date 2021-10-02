@@ -57,7 +57,7 @@ const buyToken = async (trade, coin, amountBNB, tokenAmount, swapWith) => {
         new ethers.BigNumber.from(maxAllowance),
         {
           gasLimit: gasLimit,
-          gasPrice: 10 * GWEI,
+          gasPrice: 5 * GWEI,
         }
       );
 
@@ -110,7 +110,7 @@ const buyToken = async (trade, coin, amountBNB, tokenAmount, swapWith) => {
       deadline,
       {
         gasLimit: gasLimit,
-        gasPrice: 10 * GWEI,
+        gasPrice: 5 * GWEI,
       }
     );
 
@@ -168,7 +168,7 @@ const sellToken = async (trade, coin, amountBNB, tokenAmount, swapWith) => {
         new ethers.BigNumber.from(maxAllowance),
         {
           gasLimit: gasLimit,
-          gasPrice: 10 * GWEI,
+          gasPrice: 5 * GWEI,
         }
       );
 
@@ -223,7 +223,7 @@ const sellToken = async (trade, coin, amountBNB, tokenAmount, swapWith) => {
       deadline,
       {
         gasLimit: gasLimit,
-        gasPrice: 10 * GWEI,
+        gasPrice: 5 * GWEI,
       }
     );
 
