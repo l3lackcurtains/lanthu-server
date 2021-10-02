@@ -28,15 +28,11 @@ const {
 
 const buyToken = async (trade, coin, amountBNB, tokenAmount) => {
   try {
-    const amountOut = parseEther(tokenAmount.toString());
+    const amountOut = parseEther(amountBNB.toString());
 
     const to = wallet.address;
 
-    const tokenContract = new ethers.Contract(
-      WETH[chainID].address,
-      tokenABI,
-      wallet
-    );
+    const tokenContract = new ethers.Contract(WETH.address, tokenABI, wallet);
 
     const allowance = await tokenContract.allowance(
       to,
@@ -69,14 +65,14 @@ const buyToken = async (trade, coin, amountBNB, tokenAmount) => {
 
     const TOKEN = new Token(chainID, coin.address, 18, coin.name);
 
-    const pair = await Fetcher.fetchPairData(WETH[chainID], TOKEN, provider);
+    const pair = await Fetcher.fetchPairData(WETH, TOKEN, provider);
 
-    const route = new Route([pair], WETH[chainID], TOKEN);
+    const route = new Route([pair], WETH, TOKEN);
 
     const tradeData = new Trade(
       route,
-      new TokenAmount(TOKEN, amountOut),
-      TradeType.EXACT_OUTPUT
+      new TokenAmount(WETH, amountOut),
+      TradeType.EXACT_INPUT
     );
 
     const slippageTolerance = new Percent(slippage.toString(), "100");
@@ -93,29 +89,29 @@ const buyToken = async (trade, coin, amountBNB, tokenAmount) => {
 
     const value = tradeData.inputAmount.raw;
 
-    const bought = await pancakeSwapContract.swapTokensForExactTokens(
-      new ethers.BigNumber.from(String(value)),
-      new ethers.BigNumber.from(String(amountOutMin)),
-      path,
-      to,
-      deadline,
-      {
-        gasLimit: gasLimit,
-      }
-    );
+    // const bought = await pancakeSwapContract.swapExactTokensForTokens(
+    //   new ethers.BigNumber.from(String(value)),
+    //   new ethers.BigNumber.from(String(amountOutMin)),
+    //   path,
+    //   to,
+    //   deadline,
+    //   {
+    //     gasLimit: gasLimit,
+    //   }
+    // );
 
-    await bought.wait();
+    // await bought.wait();
 
-    const tradeInDB = await TradeModal.findOne({ id: trade.id });
-    tradeInDB.error = false;
-    tradeInDB.success = true;
-    await tradeInDB.save();
+    // const tradeInDB = await TradeModal.findOne({ id: trade.id });
+    // tradeInDB.error = false;
+    // tradeInDB.success = true;
+    // await tradeInDB.save();
 
-    const msg = `Bought ${tokenAmount.toFixed(4)} ${
-      coin.name
-    } at ${trade.limit.toFixed(8)} ${coin.name})}`;
-    console.log(msg);
-    await sendMessage("Token Buy completed!", msg);
+    // const msg = `Bought ${tokenAmount.toFixed(4)} ${
+    //   coin.name
+    // } at ${trade.limit.toFixed(8)} ${coin.name})}`;
+    // console.log(msg);
+    // await sendMessage("Token Buy completed!", msg);
   } catch (e) {
     const msg = `Error on token buy! ${tokenAmount.toFixed(4)} ${
       coin.name
@@ -138,7 +134,7 @@ const buyToken = async (trade, coin, amountBNB, tokenAmount) => {
 
 const sellToken = async (trade, coin, amountBNB, tokenAmount) => {
   try {
-    const amountIn = parseEther(tokenAmount.toString());
+    const amountIn = parseEther(amountBNB.toString());
 
     const to = wallet.address;
 
@@ -177,14 +173,14 @@ const sellToken = async (trade, coin, amountBNB, tokenAmount) => {
 
     const TOKEN = new Token(chainID, coin.address, 18, coin.name);
 
-    const pair = await Fetcher.fetchPairData(TOKEN, WETH[chainID], provider);
+    const pair = await Fetcher.fetchPairData(TOKEN, WETH, provider);
 
-    const route = new Route([pair], TOKEN, WETH[chainID]);
+    const route = new Route([pair], TOKEN, WETH);
 
     const tradeData = new Trade(
       route,
-      new TokenAmount(TOKEN, amountIn),
-      TradeType.EXACT_INPUT
+      new TokenAmount(WETH, amountIn),
+      TradeType.EXACT_OUTPUT
     );
 
     const slippageTolerance = new Percent(slippage.toString(), "100");
@@ -201,7 +197,7 @@ const sellToken = async (trade, coin, amountBNB, tokenAmount) => {
 
     const value = tradeData.inputAmount.raw;
 
-    const sold = await pancakeSwapContract.swapExactTokensForTokens(
+    const sold = await pancakeSwapContract.swapTokensForExactTokens(
       new ethers.BigNumber.from(String(value)),
       new ethers.BigNumber.from(String(amountInMax)),
       path,

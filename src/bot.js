@@ -1,4 +1,4 @@
-const { TradeModal, TokenModal, LogModal } = require("./common/db");
+const { TradeModal, TokenModal, LogModal, BUSD } = require("./common/db");
 const { provider, chainID } = require("./common/wallet");
 const { Fetcher, Route, Token, WETH } = require("@pancakeswap/sdk");
 const { buyToken, sellToken } = require("./trade");
@@ -16,11 +16,17 @@ const startTheBot = async () => {
     try {
       const TOKEN = new Token(chainID, coin.address, 18, coin.name);
 
-      const pair = await Fetcher.fetchPairData(WETH[chainID], TOKEN, provider);
-
+      const pair = await Fetcher.fetchPairData(BUSD, TOKEN, provider);
       const route = new Route([pair], TOKEN);
-
       const currentPrice = route.midPrice.toSignificant(8);
+
+      const pairBNB = await Fetcher.fetchPairData(
+        WETH[chainID],
+        TOKEN,
+        provider
+      );
+      const routeBNB = new Route([pairBNB], TOKEN);
+      const currentPriceBNB = routeBNB.midPrice.toSignificant(8);
 
       if (
         trade.type === "BUY" &&
@@ -28,7 +34,9 @@ const startTheBot = async () => {
         currentPrice < trade.limit
       ) {
         const tokenAmount = parseFloat(trade.amount).toFixed(18);
-        const amountBNB = parseFloat(trade.amount * currentPrice).toFixed(18);
+        const amountBNB = parseFloat(trade.amount * currentPriceBNB).toFixed(
+          18
+        );
         console.log(
           `Start buying ${tokenAmount} ${TOKEN.symbol} (${amountBNB} BNB) `
         );
@@ -39,7 +47,9 @@ const startTheBot = async () => {
         currentPrice > trade.limit
       ) {
         const tokenAmount = parseFloat(trade.amount).toFixed(18);
-        const amountBNB = parseFloat(trade.amount * currentPrice).toFixed(18);
+        const amountBNB = parseFloat(trade.amount * currentPriceBNB).toFixed(
+          18
+        );
         console.log(
           `Start selling ${tokenAmount} ${TOKEN.symbol} (${amountBNB} BNB) `
         );
