@@ -16,7 +16,7 @@ const startTheBot = async () => {
     try {
       const TOKEN = new Token(chainID, coin.address, 18, coin.name);
 
-      const pair = await Fetcher.fetchPairData(WETH, TOKEN, provider);
+      const pair = await Fetcher.fetchPairData(WETH[chainID], TOKEN, provider);
 
       const route = new Route([pair], TOKEN);
 
