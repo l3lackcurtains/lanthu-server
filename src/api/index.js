@@ -98,6 +98,7 @@ router.put("/tokens/:name", async (req, res) => {
   const address = req.body.address;
   const slug = req.body.slug;
   const newName = req.body.name;
+  const swapWith = req.body.swapWith;
 
   if (address.length !== 42 || address.substr(0, 2) !== "0x") {
     res.json({ success: false, message: `Address wrong.` });
@@ -111,8 +112,7 @@ router.put("/tokens/:name", async (req, res) => {
         name: newName,
         address: address,
         slug: slug,
-        swapWith,
-        swapWith,
+        swapWith: swapWith,
       }
     );
     res.json({ success: true, message: `Token updated.` });
