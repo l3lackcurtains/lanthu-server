@@ -159,7 +159,7 @@ router.get("/tokeninfo/:name", async (req, res) => {
     const token = await TokenModal.findOne({ name });
 
     if (token !== null) {
-      const { balance, price, busdBalance } = await getTokenPriceAndBalance(
+      const { balance, price, bnbBalance } = await getTokenPriceAndBalance(
         token
       );
 
@@ -167,7 +167,7 @@ router.get("/tokeninfo/:name", async (req, res) => {
         token: token.name,
         address: token.address,
         balance,
-        busdBalance,
+        bnbBalance,
         price,
       };
 
