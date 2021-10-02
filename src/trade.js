@@ -23,12 +23,11 @@ const {
   maxAllowance,
   gasLimit,
   slippage,
-  GWEI,
 } = require("./common/wallet");
 
 const buyToken = async (trade, coin, amountUSD, tokenAmount) => {
   try {
-    const amountOut = parseEther(tokenAmount.toString());
+    const amountOut = parseEther(amountUSD.toString());
 
     const to = wallet.address;
 
