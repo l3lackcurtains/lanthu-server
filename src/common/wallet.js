@@ -31,7 +31,7 @@ const slippage = 3;
 
 const maxAllowance = "1000000000000000000000000";
 
-const gasLimit = 6700000;
+const gasLimit = 300000;
 
 const GWEI = 1000 * 1000 * 1000;
 
