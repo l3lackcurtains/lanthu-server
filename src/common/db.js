@@ -66,6 +66,10 @@ const tokenSchema = new Schema(
       unique: true, // `email` must be unique
     },
     address: String,
+    decimal: {
+      type: Number,
+      default: 18,
+    },
     slug: String,
     swapWith: {
       type: String,

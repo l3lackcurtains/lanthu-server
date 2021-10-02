@@ -1,5 +1,5 @@
 const gcm = require("node-gcm");
-const { DeviceModal, startDB } = require("./common/db");
+const { DeviceModal, startDB } = require("./db");
 require("dotenv").config();
 // Set up the sender with your GCM/FCM API key (declare this once for multiple messages)
 const sender = new gcm.Sender(process.env.FB_KEY);
