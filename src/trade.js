@@ -98,7 +98,7 @@ const buyToken = async (trade, coin, amountBNB, tokenAmount, swapWith) => {
       path.push(px.address);
     }
 
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 10;
 
     const value = tradeData.inputAmount.raw;
 
@@ -168,7 +168,7 @@ const sellToken = async (trade, coin, amountBNB, tokenAmount, swapWith) => {
         new ethers.BigNumber.from(maxAllowance),
         {
           gasLimit: gasLimit,
-          gasPrice: 20 * GWEI,
+          gasPrice: 10 * GWEI,
         }
       );
 
@@ -211,7 +211,7 @@ const sellToken = async (trade, coin, amountBNB, tokenAmount, swapWith) => {
       path.push(px.address);
     }
 
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 10;
 
     const value = tradeData.inputAmount.raw;
 
