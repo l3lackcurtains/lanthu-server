@@ -89,29 +89,29 @@ const buyToken = async (trade, coin, amountBNB, tokenAmount) => {
 
     const value = tradeData.inputAmount.raw;
 
-    // const bought = await pancakeSwapContract.swapExactTokensForTokens(
-    //   new ethers.BigNumber.from(String(value)),
-    //   new ethers.BigNumber.from(String(amountOutMin)),
-    //   path,
-    //   to,
-    //   deadline,
-    //   {
-    //     gasLimit: gasLimit,
-    //   }
-    // );
+    const bought = await pancakeSwapContract.swapExactTokensForTokens(
+      new ethers.BigNumber.from(String(value)),
+      new ethers.BigNumber.from(String(amountOutMin)),
+      path,
+      to,
+      deadline,
+      {
+        gasLimit: gasLimit,
+      }
+    );
 
-    // await bought.wait();
+    await bought.wait();
 
-    // const tradeInDB = await TradeModal.findOne({ id: trade.id });
-    // tradeInDB.error = false;
-    // tradeInDB.success = true;
-    // await tradeInDB.save();
+    const tradeInDB = await TradeModal.findOne({ id: trade.id });
+    tradeInDB.error = false;
+    tradeInDB.success = true;
+    await tradeInDB.save();
 
-    // const msg = `Bought ${tokenAmount.toFixed(4)} ${
-    //   coin.name
-    // } at ${trade.limit.toFixed(8)} ${coin.name})}`;
-    // console.log(msg);
-    // await sendMessage("Token Buy completed!", msg);
+    const msg = `Bought ${tokenAmount.toFixed(4)} ${
+      coin.name
+    } at ${trade.limit.toFixed(8)} ${coin.name})}`;
+    console.log(msg);
+    await sendMessage("Token Buy completed!", msg);
   } catch (e) {
     const msg = `Error on token buy! ${tokenAmount.toFixed(4)} ${
       coin.name
