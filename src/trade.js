@@ -28,7 +28,7 @@ const {
 
 const buyToken = async (trade, coin, amountBNB, tokenAmount) => {
   try {
-    const amountOut = parseEther(amountBNB.toString());
+    const amountOut = parseEther(tokenAmount.toString());
 
     const to = wallet.address;
 
@@ -71,8 +71,8 @@ const buyToken = async (trade, coin, amountBNB, tokenAmount) => {
 
     const tradeData = new Trade(
       route,
-      new TokenAmount(WETH, amountOut),
-      TradeType.EXACT_INPUT
+      new TokenAmount(TOKEN, amountOut),
+      TradeType.EXACT_OUTPUT
     );
 
     const slippageTolerance = new Percent(slippage.toString(), "100");
@@ -89,7 +89,7 @@ const buyToken = async (trade, coin, amountBNB, tokenAmount) => {
 
     const value = tradeData.inputAmount.raw;
 
-    const bought = await pancakeSwapContract.swapExactTokensForTokens(
+    const bought = await pancakeSwapContract.swapTokensForExactTokens(
       new ethers.BigNumber.from(String(value)),
       new ethers.BigNumber.from(String(amountOutMin)),
       path,
@@ -134,7 +134,7 @@ const buyToken = async (trade, coin, amountBNB, tokenAmount) => {
 
 const sellToken = async (trade, coin, amountBNB, tokenAmount) => {
   try {
-    const amountIn = parseEther(amountBNB.toString());
+    const amountIn = parseEther(tokenAmount.toString());
 
     const to = wallet.address;
 
@@ -179,8 +179,8 @@ const sellToken = async (trade, coin, amountBNB, tokenAmount) => {
 
     const tradeData = new Trade(
       route,
-      new TokenAmount(WETH, amountIn),
-      TradeType.EXACT_OUTPUT
+      new TokenAmount(TOKEN, amountIn),
+      TradeType.EXACT_INPUT
     );
 
     const slippageTolerance = new Percent(slippage.toString(), "100");
@@ -197,7 +197,7 @@ const sellToken = async (trade, coin, amountBNB, tokenAmount) => {
 
     const value = tradeData.inputAmount.raw;
 
-    const sold = await pancakeSwapContract.swapTokensForExactTokens(
+    const sold = await pancakeSwapContract.swapExactTokensForTokens(
       new ethers.BigNumber.from(String(value)),
       new ethers.BigNumber.from(String(amountInMax)),
       path,
