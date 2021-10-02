@@ -29,7 +29,7 @@ const getTokenPriceAndBalance = async (token) => {
   const busdContract = new ethers.Contract(BUSD.address, tokenABI, wallet);
   const busdBalance = await busdContract.balanceOf(wallet.address);
 
-  const TOKEN = new Token(chainID, token.address, 18, token.name);
+  const TOKEN = new Token(chainID, token.address, token.decimal, token.name);
 
   const pairBNB = await Fetcher.fetchPairData(WETH[chainID], TOKEN, provider);
   const routeBNB = new Route([pairBNB], TOKEN);
@@ -99,6 +99,7 @@ router.put("/tokens/:name", async (req, res) => {
   const slug = req.body.slug;
   const newName = req.body.name;
   const swapWith = req.body.swapWith;
+  const decimal = req.body.decimal;
 
   if (address.length !== 42 || address.substr(0, 2) !== "0x") {
     res.json({ success: false, message: `Address wrong.` });
@@ -113,6 +114,7 @@ router.put("/tokens/:name", async (req, res) => {
         address: address,
         slug: slug,
         swapWith: swapWith,
+        decimal: decimal,
       }
     );
     res.json({ success: true, message: `Token updated.` });

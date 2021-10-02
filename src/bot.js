@@ -1,7 +1,8 @@
 const { TradeModal, TokenModal, LogModal } = require("./common/db");
 const { provider, chainID, BUSD } = require("./common/wallet");
 const { Fetcher, Route, Token, WETH } = require("@pancakeswap/sdk");
-const { buyToken, sellToken } = require("./trade");
+const { buyToken } = require("./trade/buy");
+const { sellToken } = require("./trade/sell");
 
 const startTheBot = async () => {
   const trades = await TradeModal.find();
@@ -13,9 +14,13 @@ const startTheBot = async () => {
     const tokenName = trade.token.toUpperCase();
     const coin = await TokenModal.findOne({ name: tokenName });
 
-    try {
-      const TOKEN = new Token(chainID, coin.address, 18, coin.name);
+    const TOKEN = new Token(chainID, coin.address, coin.decimal, coin.name);
 
+    try {
+      // ********************************************
+      // Get Current Price
+      // ********************************************
+      // GET BNB to TOKEN Price
       const pairBNB = await Fetcher.fetchPairData(
         WETH[chainID],
         TOKEN,
@@ -24,6 +29,7 @@ const startTheBot = async () => {
       const routeBNB = new Route([pairBNB], TOKEN);
       const currentPriceBNB = routeBNB.midPrice.toSignificant(8);
 
+      // GET BNB to BUSD Price
       const pairBUSD = await Fetcher.fetchPairData(
         BUSD,
         WETH[chainID],
@@ -33,33 +39,41 @@ const startTheBot = async () => {
       const currentPriceBUSD = routeBUSD.midPrice.toSignificant(8);
 
       const currentPrice = currentPriceBNB * currentPriceBUSD;
+      // ********************************************
+
+      // GET BUSD to TOKEN Price
+
+      const pairTokenBUSD = await Fetcher.fetchPairData(BUSD, TOKEN, provider);
+      const routeTokenBUSD = new Route([pairTokenBUSD], TOKEN);
+      const currentPriceTokenBUSD = routeTokenBUSD.midPrice.toSignificant(8);
+
+      const tokenAmount = parseFloat(trade.amount);
+      const currentPriceConversion =
+        coin.swapWith === "BUSD" ? currentPriceTokenBUSD : currentPriceBNB;
+      const swapAmount = parseFloat(trade.amount * currentPriceConversion);
+
+      // ********************************************
+      // EXECUTE Transaction
+      // ********************************************
 
       if (
         trade.type === "BUY" &&
         trade.limit > 0 &&
         currentPrice < trade.limit
       ) {
-        const tokenAmount = parseFloat(trade.amount).toFixed(18);
-        const amountBNB = parseFloat(trade.amount * currentPriceBNB).toFixed(
-          18
-        );
         console.log(
-          `Start buying ${tokenAmount} ${TOKEN.symbol} (${amountBNB} BNB) `
+          `Start buying ${tokenAmount} ${TOKEN.symbol} (${swapAmount} ${coin.swapWith}) `
         );
-        await buyToken(trade, coin, amountBNB, tokenAmount, coin.swapWith);
+        await buyToken(trade, coin, swapAmount, tokenAmount);
       } else if (
         trade.type === "SELL" &&
         trade.limit > 0 &&
         currentPrice > trade.limit
       ) {
-        const tokenAmount = parseFloat(trade.amount).toFixed(18);
-        const amountBNB = parseFloat(trade.amount * currentPriceBNB).toFixed(
-          18
-        );
         console.log(
-          `Start selling ${tokenAmount} ${TOKEN.symbol} (${amountBNB} BNB) `
+          `Start selling ${tokenAmount} ${TOKEN.symbol} (${swapAmount} ${coin.swapWith}) `
         );
-        await sellToken(trade, coin, amountBNB, tokenAmount, coin.swapWith);
+        await sellToken(trade, coin, swapAmount, tokenAmount);
       }
     } catch (e) {
       const errStr = e.toString();
