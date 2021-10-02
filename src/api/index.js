@@ -42,11 +42,11 @@ const getTokenPriceAndBalance = async (token) => {
   const price = currentPriceBNB * bnbInUsd;
 
   return {
-    balance: parseFloat(formatEther(balance)).toFixed(8),
-    price: parseFloat(price).toFixed(8),
-    bnbPrice: parseFloat(bnbInUsd).toFixed(8),
-    bnbBalance: parseFloat(formatEther(bnbBalance)).toFixed(8),
-    busdBalance: parseFloat(formatEther(busdBalance)).toFixed(8),
+    balance: parseFloat(formatEther(balance)),
+    price: parseFloat(price),
+    bnbPrice: parseFloat(bnbInUsd),
+    bnbBalance: parseFloat(formatEther(bnbBalance)),
+    busdBalance: parseFloat(formatEther(busdBalance)),
   };
 };
 
