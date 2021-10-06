@@ -27,7 +27,7 @@ const pancakeSwapContract = new ethers.Contract(
 
 const chainID = ChainId.MAINNET;
 
-const slippage = 1.5;
+const slippage = 1;
 
 const maxAllowance = "1000000000000000000000000";
 
