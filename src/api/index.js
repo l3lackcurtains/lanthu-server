@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { formatEther } = require("@ethersproject/units");
+const { formatEther, formatUnits } = require("@ethersproject/units");
 const { Route, Token, Fetcher, WETH } = require("@pancakeswap/sdk");
 const { ethers } = require("ethers");
 const express = require("express");
@@ -43,9 +43,8 @@ const getTokenPriceAndBalance = async (token) => {
   } else {
     price = bnbInUsd;
   }
-
   return {
-    balance: parseFloat(formatEther(balance)),
+    balance: parseFloat(formatUnits(balance, token.decimal)),
     price: parseFloat(price),
     bnbPrice: parseFloat(bnbInUsd),
     bnbBalance: parseFloat(formatEther(bnbBalance)),
