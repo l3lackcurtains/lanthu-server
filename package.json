@@ -7,6 +7,7 @@
     "dev": "nodemon --exec babel-node src/index.js",
     "lint": "eslint .",
     "build": "rimraf ./build && babel ./src -s -d ./build --copy-files",
+    "heroku-postbuild": "rimraf ./build && babel ./src -s -d ./build --copy-files",
     "start": "node ./build/index.js"
   },
   "heroku-run-build-script": true,
