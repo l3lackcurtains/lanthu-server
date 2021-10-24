@@ -1,34 +1,17 @@
-const { startTheBot } = require("./bot");
-const { startDB } = require("./common/db");
-const express = require("express");
-const path = require("path");
-const helmet = require("helmet");
-const app = express();
-const port = process.env.PORT || 3000;
-const { router } = require("./api");
+import { ApolloServer } from 'apollo-server'
+import { getSchema } from './utils/getSchema'
+import { startTheBot } from './bot'
+import { startDB } from './utils/db'
 
-app.use(express.json({ limit: "50mb" }));
+const server = new ApolloServer({ schema: getSchema(), playground: true })
 
-app.use(
-  express.urlencoded({
-    limit: "50mb",
-    extended: false,
-    parameterLimit: 50000,
-  })
-);
-app.use(helmet());
-app.use("/", express.static(path.join(__dirname, "public")));
-
-app.use("/", router);
-
-app.listen(port, async () => {
-  console.log(`App listening at http://localhost:${port}`);
-  await startDB();
-  await runBot();
-});
+server.listen({ port: process.env.PORT || 8000 }).then(async ({ url }) => {
+    console.log(`🚀 Server is ready at ${url}`)
+    await startDB()
+})
 
 const runBot = async () => {
-  while (1) {
-    await startTheBot();
-  }
-};
+    while (1) {
+        await startTheBot()
+    }
+}
