@@ -27,7 +27,7 @@ const startDB = async () => {
             console.log('Connecting to Database.')
         }
     } catch (e) {
-        console.log(e)
+        console.log(e.toString())
     }
 }
 

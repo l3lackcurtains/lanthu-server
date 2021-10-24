@@ -61,8 +61,7 @@ const startTheBot = async () => {
                 })
                 newLog.save()
 
-                console.log(e)
-                console.log(msg)
+                console.log(msg, e)
 
                 const tradeInDB = await TradeModal.findOne({ id: trade.id })
                 tradeInDB.error = true

@@ -158,7 +158,7 @@ const updateSoldStatus = async (trade, coin, tokenAmount, currentPrice) => {
 const updateErrorStatus = async (trade, msg, e = '') => {
     const newLog = new LogModal({ message: msg, details: e.toString() })
     newLog.save()
-    console.log(msg, e)
+    console.log(msg)
 
     // Update status and send notification
     const tradeInDB = await TradeModal.findOne({ _id: trade._id })
