@@ -1,4 +1,4 @@
-const {
+import {
     Fetcher,
     Percent,
     Route,
@@ -7,15 +7,15 @@ const {
     Trade,
     TradeType,
     WETH,
-} = require('@pancakeswap/sdk')
+} from '@pancakeswap/sdk'
 
-const { ethers } = require('ethers')
-const { formatEther } = require('ethers/lib/utils')
-const tokenABI = require('../utils/abi/token.json')
-const { TradeModal, LogModal, HistoryModal } = require('../utils/db')
-const { sendMessage } = require('../utils/notification')
+import { ethers } from 'ethers'
+import { formatEther } from 'ethers/lib/utils'
+import tokenABI from '../utils/abi/token.json'
+import { TradeModal, LogModal, HistoryModal } from '../utils/db'
+import { sendMessage } from '../utils/notification'
 
-const {
+import {
     provider,
     wallet,
     pancakeSwapContract,
@@ -26,7 +26,7 @@ const {
     slippage,
     GWEI,
     BUSD,
-} = require('../utils/wallet')
+} from '../utils/wallet'
 
 const sellToken = async (
     trade,

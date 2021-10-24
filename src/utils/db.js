@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 require('dotenv').config()
 
 const dbUser = process.env.DB_USER

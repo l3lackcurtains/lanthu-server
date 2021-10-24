@@ -1,10 +1,9 @@
 require('dotenv').config()
-const { formatEther, formatUnits } = require('@ethersproject/units')
-const { Route, Token, Fetcher, WETH } = require('@pancakeswap/sdk')
-const { ethers } = require('ethers')
-
-const tokenABI = require('./abi/token.json')
-const { wallet, chainID, provider, BUSD } = require('./wallet')
+import { formatEther, formatUnits } from '@ethersproject/units'
+import { Route, Token, Fetcher, WETH } from '@pancakeswap/sdk'
+import { ethers } from 'ethers'
+import tokenABI from './abi/token.json'
+import { wallet, chainID, provider, BUSD } from './wallet'
 
 const getTokenPriceAndBalance = async (token) => {
     const tokenContract = new ethers.Contract(token.address, tokenABI, wallet)
