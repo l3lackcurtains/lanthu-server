@@ -67,6 +67,7 @@ export default {
                     if (sellLimit) tradeDb.sellLimit = sellLimit
                     if (stopLossLimit) tradeDb.stopLossLimit = stopLossLimit
                     if (status) tradeDb.status = status
+                    if (tokenId) tradeDb.tokenId = tokenId
 
                     const updated = await tradeDb.save()
                     return {

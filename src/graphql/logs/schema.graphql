@@ -19,3 +19,7 @@ type LogResult {
 type Query {
     getLogs: LogResults!
 }
+
+type Mutation {
+    removeLog(_id: String!): LogResult!
+}
