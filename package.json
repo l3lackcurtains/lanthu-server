@@ -4,15 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build-babel": "babel ./src -s -d ./build --copy-files",
     "dev": "nodemon --exec babel-node src/index.js",
     "lint": "eslint .",
-    "clean": "rimraf ./build",
-    "build": "npm run clean && npm run build-babel",
-    "start": "npm run build && node ./build/index.js"
+    "build": "rimraf ./build && babel ./src -s -d ./build --copy-files",
+    "start": "node ./build/index.js"
   },
+  "heroku-run-build-script": true,
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@babel/cli": "^7.15.7",
     "@babel/core": "^7.15.8",
