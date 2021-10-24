@@ -103,19 +103,19 @@ const buyToken = async (trade, coin, swapAmount, tokenAmount, currentPrice) => {
 
         const value = tradeData.inputAmount.raw
 
-        // const bought = await pancakeSwapContract.swapExactTokensForTokens(
-        //     new ethers.BigNumber.from(String(value)),
-        //     new ethers.BigNumber.from(String(amountOutMin)),
-        //     path,
-        //     to,
-        //     deadline,
-        //     {
-        //         gasLimit: gasLimit,
-        //         gasPrice: 5 * GWEI,
-        //     }
-        // )
+        const bought = await pancakeSwapContract.swapExactTokensForTokens(
+            new ethers.BigNumber.from(String(value)),
+            new ethers.BigNumber.from(String(amountOutMin)),
+            path,
+            to,
+            deadline,
+            {
+                gasLimit: gasLimit,
+                gasPrice: 5 * GWEI,
+            }
+        )
 
-        // await bought.wait()
+        await bought.wait()
         await updateBoughtStatus(trade, coin, tokenAmount, currentPrice)
     } catch (e) {
         const msg = `Error on token buy! ${tokenAmount} ${coin.name} at ${currentPrice} ${coin.name}`

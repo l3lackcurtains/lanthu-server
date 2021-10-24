@@ -16,5 +16,5 @@ type TokenInfoResult {
 }
 
 type Query {
-    getTokenInfo(_id: String): TokenInfoResult!
+    getTokenInfo(tokenId: String): TokenInfoResult!
 }

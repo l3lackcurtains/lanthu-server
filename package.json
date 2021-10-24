@@ -4,10 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "babel ./src -s -d ./build --copy-files",
+    "build-babel": "babel ./src -s -d ./build --copy-files",
     "dev": "nodemon --exec babel-node src/index.js",
     "lint": "eslint .",
-    "start": "node ./build/index.js"
+    "clean": "rimraf ./build",
+    "build": "npm run clean && npm run build-babel",
+    "start": "npm run build && node ./build/index.js"
   },
   "author": "",
   "license": "ISC",

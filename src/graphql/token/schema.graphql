@@ -5,6 +5,7 @@ type Token {
     decimal: Int
     slug: String
     base: String
+    info: TokenInfo
 }
 
 type TokenResults {
@@ -20,7 +21,7 @@ type TokenResult {
 }
 
 type Query {
-    getTokens: TokenResults!
+    getTokens(info: Int): TokenResults!
 }
 
 type Mutation {

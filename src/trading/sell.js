@@ -117,19 +117,19 @@ const sellToken = async (
 
         const value = tradeData.inputAmount.raw
 
-        // const sold = await pancakeSwapContract.swapExactTokensForTokens(
-        //     new ethers.BigNumber.from(String(value)),
-        //     new ethers.BigNumber.from(String(amountOutMin)),
-        //     path,
-        //     to,
-        //     deadline,
-        //     {
-        //         gasLimit: gasLimit,
-        //         gasPrice: 5 * GWEI,
-        //     }
-        // )
+        const sold = await pancakeSwapContract.swapExactTokensForTokens(
+            new ethers.BigNumber.from(String(value)),
+            new ethers.BigNumber.from(String(amountOutMin)),
+            path,
+            to,
+            deadline,
+            {
+                gasLimit: gasLimit,
+                gasPrice: 5 * GWEI,
+            }
+        )
 
-        // await sold.wait()
+        await sold.wait()
 
         await updateSoldStatus(trade, coin, tokenAmount, currentPrice)
     } catch (e) {

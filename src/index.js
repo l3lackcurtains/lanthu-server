@@ -10,7 +10,7 @@ import path from 'path'
 import { router } from './api'
 
 const PORT = process.env.PORT || 8000
-
+const HOST = 'localhost'
 async function startApolloServer() {
     const app = express()
 
@@ -29,11 +29,16 @@ async function startApolloServer() {
     app.use('/', router)
 
     const httpServer = http.createServer(app)
-
+    const corsOptions = {
+        origin: `http://${HOST}:${PORT}`,
+        credentials: true,
+    }
     const server = new ApolloServer({
         schema: getSchema(),
-        playground: true,
         plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+        playground: true,
+        introspection: true,
+        cors: corsOptions,
     })
 
     await server.start()

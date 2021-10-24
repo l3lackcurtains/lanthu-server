@@ -4,10 +4,10 @@ import { TokenModal } from '../../utils/db'
 export default {
     Query: {
         getTokenInfo: async (_, args, ctx) => {
-            const { _id } = args
+            const { tokenId } = args
 
             try {
-                const token = await TokenModal.findOne({ _id })
+                const token = await TokenModal.findOne({ _id: tokenId })
 
                 if (token !== null) {
                     const {

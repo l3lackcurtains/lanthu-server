@@ -1,4 +1,5 @@
 import { TradeModal, TokenModal } from '../../utils/db'
+import { getTokenPriceAndBalance } from '../../utils/helpers'
 
 export default {
     Query: {
