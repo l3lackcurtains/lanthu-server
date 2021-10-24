@@ -11,9 +11,9 @@ const {
 
 const { ethers } = require("ethers");
 const { formatEther } = require("ethers/lib/utils");
-const tokenABI = require("../abi/token.json");
-const { TradeModal, LogModal } = require("../common/db");
-const { sendMessage } = require("../common/notification");
+const tokenABI = require("../utils/abi/token.json");
+const { TradeModal, LogModal } = require("../utils/db");
+const { sendMessage } = require("../utils/notification");
 
 const {
   provider,
@@ -26,7 +26,7 @@ const {
   slippage,
   GWEI,
   BUSD,
-} = require("../common/wallet");
+} = require("../utils/wallet");
 
 const sellToken = async (
   trade,

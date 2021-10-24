@@ -1,7 +1,8 @@
 const { ChainId, Token, Route, Fetcher } = require("@pancakeswap/sdk");
 const { ethers } = require("ethers");
 require("dotenv").config();
-const tokenABI = require("../abi/token.json");
+const tokenABI = require("./abi/token.json");
+
 // BINANCE SMART CHAIN
 const provider = new ethers.providers.JsonRpcProvider(
   "https://bsc-dataseed.binance.org/",
@@ -21,13 +22,13 @@ const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 
 const pancakeSwapContract = new ethers.Contract(
   pancakeSwapContractAddress,
-  require("../abi/swap.json"),
+  require("./abi/swap.json"),
   wallet
 );
 
 const chainID = ChainId.MAINNET;
 
-const slippage = 1;
+const slippage = 2;
 
 const maxAllowance = "1000000000000000000000000";
 
