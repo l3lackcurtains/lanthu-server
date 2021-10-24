@@ -8,6 +8,7 @@ const server = new ApolloServer({ schema: getSchema(), playground: true })
 server.listen({ port: process.env.PORT || 8000 }).then(async ({ url }) => {
     console.log(`🚀 Server is ready at ${url}`)
     await startDB()
+    await runBot()
 })
 
 const runBot = async () => {

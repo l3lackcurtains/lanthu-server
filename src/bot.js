@@ -1,95 +1,31 @@
 import { TradeModal, TokenModal, LogModal } from './utils/db'
-import { provider, chainID, BUSD } from './utils/wallet'
-import { Fetcher, Route, Token, WETH } from '@pancakeswap/sdk'
-import { buyToken } from './trade/buy'
-import { sellToken } from './trade/sell'
+import { getCurrentPrice } from './utils/helpers'
+import { buyToken } from './trading/buy'
+import { sellToken } from './trading/sell'
 
 const startTheBot = async () => {
     const trades = await TradeModal.find()
 
     for (let trade of trades) {
         // Skip success trades..
-        if (trade.success || trade.error) continue
+        if (trade.status === 'SOLD' || trade.status === 'ERROR') continue
 
-        const tokenName = trade.token.toUpperCase()
-        const coin = await TokenModal.findOne({ name: tokenName })
+        const coin = await TokenModal.findOne({ _id: trade.tokenId })
 
-        const TOKEN = new Token(chainID, coin.address, coin.decimal, coin.name)
+        const { currentPrice, currentPriceConversion } = await getCurrentPrice(
+            coin
+        )
 
         try {
-            // ********************************************
-            // Get Current Price
-            // ********************************************
-            let currentPrice = 0
-            // GET BNB to TOKEN Price
-            if (coin.name !== 'BNB') {
-                const pairBNB = await Fetcher.fetchPairData(
-                    WETH[chainID],
-                    TOKEN,
-                    provider
-                )
-                const routeBNB = new Route([pairBNB], TOKEN)
-                const currentPriceBNB = routeBNB.midPrice.toSignificant(6)
-
-                // GET BNB to BUSD Price
-                const pairBUSD = await Fetcher.fetchPairData(
-                    BUSD,
-                    WETH[chainID],
-                    provider
-                )
-                const routeBUSD = new Route([pairBUSD], WETH[chainID])
-                const currentPriceBUSD = routeBUSD.midPrice.toSignificant(6)
-
-                currentPrice = currentPriceBNB * currentPriceBUSD
-            } else {
-                // GET BNB to BUSD Price
-                const pairBUSD = await Fetcher.fetchPairData(
-                    BUSD,
-                    WETH[chainID],
-                    provider
-                )
-                const routeBUSD = new Route([pairBUSD], WETH[chainID])
-                const currentPriceBUSD = routeBUSD.midPrice.toSignificant(6)
-
-                currentPrice = currentPriceBUSD
-            }
-            // ********************************************
-
-            // GET BUSD to TOKEN Price
-            let currentPriceConversion = 0
-            if (coin.swapWith === 'BUSD') {
-                const pairTokenBUSD = await Fetcher.fetchPairData(
-                    BUSD,
-                    TOKEN,
-                    provider
-                )
-                const routeTokenBUSD = new Route([pairTokenBUSD], TOKEN)
-                const currentPriceTokenBUSD =
-                    routeTokenBUSD.midPrice.toSignificant(6)
-                currentPriceConversion = currentPriceTokenBUSD
-            } else {
-                const pairBNB = await Fetcher.fetchPairData(
-                    WETH[chainID],
-                    TOKEN,
-                    provider
-                )
-                const routeBNB = new Route([pairBNB], TOKEN)
-                const currentPriceBNB = routeBNB.midPrice.toSignificant(6)
-                currentPriceConversion = currentPriceBNB
-            }
             const tokenAmount = parseFloat(trade.amount)
             const swapAmount = parseFloat(trade.amount * currentPriceConversion)
-
-            // ********************************************
-            // EXECUTE Transaction
-            // ********************************************
             if (
-                trade.type === 'BUY' &&
-                trade.limit > 0 &&
-                currentPrice < trade.limit
+                trade.status === 'INIT' &&
+                trade.buyLimit > 0 &&
+                currentPrice < trade.buyLimit
             ) {
                 console.log(
-                    `Start buying ${tokenAmount} ${TOKEN.symbol} (${swapAmount} ${coin.swapWith}) `
+                    `Start buying ${tokenAmount} ${coin.name} (${swapAmount} ${coin.base}) `
                 )
                 await buyToken(
                     trade,
@@ -99,12 +35,13 @@ const startTheBot = async () => {
                     currentPrice
                 )
             } else if (
-                trade.type === 'SELL' &&
-                trade.limit > 0 &&
-                currentPrice > trade.limit
+                trade.status === 'BOUGHT' &&
+                ((trade.sellLimit > 0 && currentPrice > trade.sellLimit) ||
+                    (trade.stopLossLimit > 0 &&
+                        currentPrice < trade.stopLossLimit))
             ) {
                 console.log(
-                    `Start selling ${tokenAmount} ${TOKEN.symbol} (${swapAmount} ${coin.swapWith}) `
+                    `Start selling ${tokenAmount} ${coin.name} (${swapAmount} ${coin.base}) `
                 )
                 await sellToken(
                     trade,
