@@ -125,7 +125,7 @@ const buyToken = async (trade, coin, swapAmount, tokenAmount, currentPrice) => {
 
 const updateBoughtStatus = async (trade, coin, tokenAmount, currentPrice) => {
     const tradeInDB = await TradeModal.findOne({ _id: trade._id })
-    tradeInDB.status = 'BOUGHT'
+    tradeInDB.status = 'SELLING'
     await tradeInDB.save()
 
     // Save in history

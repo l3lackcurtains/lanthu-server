@@ -37,8 +37,8 @@ const tradeSchema = new Schema(
     {
         status: {
             type: String,
-            enum: ['INIT', 'BOUGHT', 'SOLD', 'ERROR'],
-            default: 'INIT',
+            enum: ['BUYING', 'SELLING', 'COMPLETED', 'ERROR'],
+            default: 'BUYING',
         },
         tokenId: {
             type: String,

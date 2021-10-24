@@ -8,7 +8,7 @@ const startTheBot = async () => {
 
     for (let trade of trades) {
         // Skip success trades..
-        if (trade.status === 'SOLD' || trade.status === 'ERROR') continue
+        if (trade.status === 'COMPLETED' || trade.status === 'ERROR') continue
 
         const coin = await TokenModal.findOne({ _id: trade.tokenId })
 
@@ -20,7 +20,7 @@ const startTheBot = async () => {
             const tokenAmount = parseFloat(trade.amount)
             const swapAmount = parseFloat(trade.amount * currentPriceConversion)
             if (
-                trade.status === 'INIT' &&
+                trade.status === 'BUYING' &&
                 trade.buyLimit > 0 &&
                 currentPrice < trade.buyLimit
             ) {
@@ -35,7 +35,7 @@ const startTheBot = async () => {
                     currentPrice
                 )
             } else if (
-                trade.status === 'BOUGHT' &&
+                trade.status === 'SELLING' &&
                 ((trade.sellLimit > 0 && currentPrice > trade.sellLimit) ||
                     (trade.stopLossLimit > 0 &&
                         currentPrice < trade.stopLossLimit))

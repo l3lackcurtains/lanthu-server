@@ -22,7 +22,7 @@ export default {
             const sellLimit = args.sellLimit && parseFloat(args.sellLimit)
             const stopLossLimit =
                 args.stopLossLimit && parseFloat(args.stopLossLimit)
-            const status = args.status || 'INIT'
+            const status = args.status || 'BUYING'
 
             try {
                 const tokenDb = await TokenModal.findOne({ _id: tokenId })
