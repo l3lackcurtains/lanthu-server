@@ -152,7 +152,7 @@ const updateSoldStatus = async (trade, coin, tokenAmount, currentPrice) => {
     }
 
     const msg = `Sold ${tokenAmount} ${coin.name} at ${currentPrice} ${coin.name}`
-    await sendMessage('${coin.name} sold', msg)
+    await sendMessage(`${coin.name} sold`, msg)
 }
 
 const updateErrorStatus = async (trade, msg, e = '') => {
