@@ -136,7 +136,7 @@ const updateBoughtStatus = async (trade, coin, tokenAmount, currentPrice) => {
     history.save()
 
     const msg = `Bought ${tokenAmount} ${coin.name} at ${currentPrice} ${coin.name}`
-    await sendMessage('${coin.name} bought', msg)
+    await sendMessage(`${coin.name} bought`, msg)
 }
 
 const updateErrorStatus = async (trade, msg, e = '') => {
