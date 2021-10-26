@@ -12,13 +12,13 @@ const startTheBot = async () => {
 
         const coin = await TokenModal.findOne({ _id: trade.tokenId })
 
-        const { currentPrice, currentPriceConversion } = await getCurrentPrice(
-            coin
-        )
-
         try {
+            const { currentPrice, currentPriceConversion } =
+                await getCurrentPrice(coin)
+
             const tokenAmount = parseFloat(trade.amount)
             const swapAmount = parseFloat(trade.amount * currentPriceConversion)
+
             if (
                 trade.status === 'BUYING' &&
                 trade.buyLimit > 0 &&
