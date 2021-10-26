@@ -16,13 +16,19 @@ export default {
             }
         },
         addToken: async (_, args) => {
-            const { name, address, slug, base } = args
+            const { name, address, slug, base, decimal } = args
 
             if (address.length !== 42 || address.substr(0, 2) !== '0x') {
                 return { error: `Address wrong.` }
             }
             try {
-                const newToken = new TokenModal({ name, address, slug, base })
+                const newToken = new TokenModal({
+                    name,
+                    address,
+                    slug,
+                    base,
+                    decimal,
+                })
                 newToken.save()
                 return { message: `Token added`, result: newToken }
             } catch (e) {
