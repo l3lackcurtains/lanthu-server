@@ -33,8 +33,7 @@ export default {
                             })
                         )
                     } catch (e) {
-                        console.log(e)
-                        console.log('Token info error.')
+                        console.error('Token info error.')
                     }
                 }
                 return { result: tokens }
