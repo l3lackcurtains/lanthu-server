@@ -31,11 +31,9 @@ import {
 const sellToken = async (trade, coin, tokenAmount, currentPrice) => {
     try {
         // Check the SWAP TOKEN
-        let SWAPTOKEN = null
+        let SWAPTOKEN = WETH[chainID]
         if (coin.base === 'BUSD') {
             SWAPTOKEN = BUSD
-        } else {
-            SWAPTOKEN = WETH[chainID]
         }
 
         const tokenContract = new ethers.Contract(
@@ -108,7 +106,7 @@ const sellToken = async (trade, coin, tokenAmount, currentPrice) => {
         if (balance.lte(amountInFinal)) {
             const msg = `Low balance ${formatEther(balance)} < ${formatEther(
                 amountInFinal
-            )} for this trade.`
+            )} while selling ${coin.name}.`
             await updateErrorStatus(trade, msg)
             return
         }
