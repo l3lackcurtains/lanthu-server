@@ -1,5 +1,6 @@
 import { TradeModal, TokenModal, LogModal } from './utils/db'
 import { getCurrentPrice } from './utils/helpers'
+import { sendMessage } from './utils/notification'
 import { buyToken } from './trading/buy'
 import { sellToken } from './trading/sell'
 
@@ -55,6 +56,10 @@ const startTheBot = async () => {
             const errStr = e.toString()
             if (errStr.includes('getReserves()')) {
                 const msg = `No token pair found for ${coin.name}.`
+                await sendMessage(
+                    `Error on ${coin.name}-${coin.base} pair`,
+                    `Error on ${coin.name}-${coin.base} pair`
+                )
                 const newLog = new LogModal({
                     message: msg,
                     details: e.toString(),
@@ -63,9 +68,8 @@ const startTheBot = async () => {
 
                 console.log(msg, e)
 
-                const tradeInDB = await TradeModal.findOne({ id: trade.id })
-                tradeInDB.error = true
-                tradeInDB.success = false
+                const tradeInDB = await TradeModal.findOne({ _id: trade.id })
+                tradeInDB.status = 'ERROR'
                 await tradeInDB.save()
             }
         }
