@@ -9,7 +9,7 @@ import {
     WETH,
 } from '@pancakeswap/sdk'
 
-import { ethers } from 'ethers'
+import { BigNumber, ethers } from 'ethers'
 import { formatEther } from 'ethers/lib/utils'
 import tokenABI from '../utils/abi/token.json'
 import { TradeModal, LogModal, HistoryModal } from '../utils/db'
@@ -28,31 +28,65 @@ import {
     BUSD,
 } from '../utils/wallet'
 
-const buyToken = async (trade, coin, swapAmount, tokenAmount, currentPrice) => {
+const buyToken = async (trade, coin, tokenAmount, currentPrice) => {
     try {
+        // Get the SWAP token
         let SWAPTOKEN = null
         if (coin.base === 'BUSD') {
             SWAPTOKEN = BUSD
         } else {
             SWAPTOKEN = WETH[chainID]
         }
-
-        const amountIn = ethers.utils.parseUnits(swapAmount.toString(), 18)
-
-        const to = wallet.address
-
         const tokenContract = new ethers.Contract(
             SWAPTOKEN.address,
             tokenABI,
             wallet
         )
 
-        const allowance = await tokenContract.allowance(
-            to,
-            pancakeSwapContractAddress
+        // Get amountOut
+        const amountOut = ethers.utils.parseUnits(
+            tokenAmount.toString(),
+            coin.decimal
         )
 
-        if (allowance.lte(amountIn)) {
+        const TOKEN = new Token(chainID, coin.address, coin.decimal, coin.name)
+
+        const pair = await Fetcher.fetchPairData(SWAPTOKEN, TOKEN, provider)
+
+        const route = new Route([pair], SWAPTOKEN, TOKEN)
+
+        const tradeData = new Trade(
+            route,
+            new TokenAmount(TOKEN, amountOut),
+            TradeType.EXACT_OUTPUT
+        )
+
+        const slippageTolerance = new Percent(slippage.toString(), '100')
+
+        const amountInMax = tradeData.maximumAmountIn(slippageTolerance).raw
+        const amountInMaxFinal = new ethers.BigNumber.from(String(amountInMax))
+
+        const path = []
+
+        for (let px of route.path) {
+            path.push(px.address)
+        }
+
+        const deadline = Math.floor(Date.now() / 1000) + 60 * 10
+
+        const value = String(tradeData.outputAmount.raw)
+        const amountOutFinal = new ethers.BigNumber.from(String(value))
+
+        /**********************************
+         * Pre-check before SWAP
+         ***********************************
+         */
+        // Check allowance
+        const allowance = await tokenContract.allowance(
+            wallet.address,
+            pancakeSwapContractAddress
+        )
+        if (allowance.lte(amountInMaxFinal)) {
             const approved = await tokenContract.approve(
                 pancakeSwapContractAddress,
                 new ethers.BigNumber.from(maxAllowance),
@@ -66,48 +100,26 @@ const buyToken = async (trade, coin, swapAmount, tokenAmount, currentPrice) => {
                 console.log('Approved...')
             })
         }
-
-        const balance = await tokenContract.balanceOf(to)
-
-        if (balance.lte(amountIn)) {
+        // Check balance
+        const balance = await tokenContract.balanceOf(wallet.address)
+        if (balance.lte(amountInMaxFinal)) {
             const msg = `Low balance ${formatEther(balance)} < ${formatEther(
-                amountIn
+                amountInMaxFinal
             )} for this trade.`
             await updateErrorStatus(trade, msg)
             return
         }
 
-        const TOKEN = new Token(chainID, coin.address, coin.decimal, coin.name)
+        /**********************************
+         * Buy token
+         ***********************************
+         */
 
-        const pair = await Fetcher.fetchPairData(SWAPTOKEN, TOKEN, provider)
-
-        const route = new Route([pair], SWAPTOKEN, TOKEN)
-
-        const tradeData = new Trade(
-            route,
-            new TokenAmount(SWAPTOKEN, amountIn),
-            TradeType.EXACT_INPUT
-        )
-
-        const slippageTolerance = new Percent(slippage.toString(), '100')
-
-        const amountOutMin = tradeData.minimumAmountOut(slippageTolerance).raw
-
-        const path = []
-
-        for (let px of route.path) {
-            path.push(px.address)
-        }
-
-        const deadline = Math.floor(Date.now() / 1000) + 60 * 10
-
-        const value = tradeData.inputAmount.raw
-
-        const bought = await pancakeSwapContract.swapExactTokensForTokens(
-            new ethers.BigNumber.from(String(value)),
-            new ethers.BigNumber.from(String(amountOutMin)),
+        const bought = await pancakeSwapContract.swapTokensForExactTokens(
+            amountOutFinal,
+            amountInMaxFinal,
             path,
-            to,
+            wallet.address,
             deadline,
             {
                 gasLimit: gasLimit,
@@ -136,6 +148,7 @@ const updateBoughtStatus = async (trade, coin, tokenAmount, currentPrice) => {
     history.save()
 
     const msg = `Bought ${tokenAmount} ${coin.name} at ${currentPrice} ${coin.name}`
+    console.log(msg)
     await sendMessage(`${coin.name} bought`, msg)
 }
 
@@ -148,7 +161,7 @@ const updateErrorStatus = async (trade, msg, e = '') => {
     const tradeInDB = await TradeModal.findOne({ _id: trade._id })
     tradeInDB.status = 'ERROR'
     await tradeInDB.save()
-    await sendMessage('Error on buying ${coin.name}', msg)
+    await sendMessage(`Error on buying ${coin.name}`, msg)
 }
 
 module.exports = { buyToken }

@@ -28,13 +28,7 @@ import {
     BUSD,
 } from '../utils/wallet'
 
-const sellToken = async (
-    trade,
-    coin,
-    swapAmount,
-    tokenAmount,
-    currentPrice
-) => {
+const sellToken = async (trade, coin, tokenAmount, currentPrice) => {
     try {
         // Check the SWAP TOKEN
         let SWAPTOKEN = null
@@ -44,7 +38,6 @@ const sellToken = async (
             SWAPTOKEN = WETH[chainID]
         }
 
-        const to = wallet.address
         const tokenContract = new ethers.Contract(
             coin.address,
             tokenABI,
@@ -57,9 +50,43 @@ const sellToken = async (
             coin.decimal
         )
 
-        // Check Allowance
+        const TOKEN = new Token(chainID, coin.address, coin.decimal, coin.name)
+
+        const pair = await Fetcher.fetchPairData(TOKEN, SWAPTOKEN, provider)
+
+        const route = new Route([pair], TOKEN, SWAPTOKEN)
+
+        const tradeData = new Trade(
+            route,
+            new TokenAmount(TOKEN, amountIn),
+            TradeType.EXACT_INPUT
+        )
+
+        const slippageTolerance = new Percent(slippage.toString(), '100')
+
+        const amountOutMin = tradeData.minimumAmountOut(slippageTolerance).raw
+        const amountOutMinFinal = new ethers.BigNumber.from(
+            String(amountOutMin)
+        )
+
+        const path = []
+
+        for (let px of route.path) {
+            path.push(px.address)
+        }
+
+        const deadline = Math.floor(Date.now() / 1000) + 60 * 10
+
+        const value = tradeData.inputAmount.raw
+        const amountInFinal = new ethers.BigNumber.from(String(value))
+
+        /**********************************
+         * Pre-check before SWAP
+         ***********************************
+         */
+        // Check allowance
         const allowance = await tokenContract.allowance(
-            to,
+            wallet.address,
             pancakeSwapContractAddress
         )
         if (allowance.lte(amountIn)) {
@@ -77,51 +104,25 @@ const sellToken = async (
         }
 
         // Check Balance
-        const balance = await tokenContract.balanceOf(to)
-        const tokenBalance = ethers.utils.parseUnits(
-            tokenAmount.toString(),
-            coin.decimal
-        )
-
-        if (balance.lte(tokenBalance)) {
+        const balance = await tokenContract.balanceOf(wallet.address)
+        if (balance.lte(amountInFinal)) {
             const msg = `Low balance ${formatEther(balance)} < ${formatEther(
-                tokenBalance
+                amountInFinal
             )} for this trade.`
             await updateErrorStatus(trade, msg)
             return
         }
 
-        const TOKEN = new Token(chainID, coin.address, coin.decimal, coin.name)
-
-        const pair = await Fetcher.fetchPairData(TOKEN, SWAPTOKEN, provider)
-
-        const route = new Route([pair], TOKEN, SWAPTOKEN)
-
-        const tradeData = new Trade(
-            route,
-            new TokenAmount(TOKEN, amountIn),
-            TradeType.EXACT_INPUT
-        )
-
-        const slippageTolerance = new Percent(slippage.toString(), '100')
-
-        const amountOutMin = tradeData.minimumAmountOut(slippageTolerance).raw
-
-        const path = []
-
-        for (let px of route.path) {
-            path.push(px.address)
-        }
-
-        const deadline = Math.floor(Date.now() / 1000) + 60 * 10
-
-        const value = tradeData.inputAmount.raw
+        /**********************************
+         * Sell token
+         ***********************************
+         */
 
         const sold = await pancakeSwapContract.swapExactTokensForTokens(
-            new ethers.BigNumber.from(String(value)),
-            new ethers.BigNumber.from(String(amountOutMin)),
+            amountInFinal,
+            amountOutMinFinal,
             path,
-            to,
+            wallet.address,
             deadline,
             {
                 gasLimit: gasLimit,
@@ -152,6 +153,7 @@ const updateSoldStatus = async (trade, coin, tokenAmount, currentPrice) => {
     }
 
     const msg = `Sold ${tokenAmount} ${coin.name} at ${currentPrice} ${coin.name}`
+    console.log(msg)
     await sendMessage(`${coin.name} sold`, msg)
 }
 
@@ -164,7 +166,7 @@ const updateErrorStatus = async (trade, msg, e = '') => {
     const tradeInDB = await TradeModal.findOne({ _id: trade._id })
     tradeInDB.status = 'ERROR'
     await tradeInDB.save()
-    await sendMessage('Error on selling ${coin.name}', msg)
+    await sendMessage(`Error on selling ${coin.name}`, msg)
 }
 
 module.exports = { sellToken }
