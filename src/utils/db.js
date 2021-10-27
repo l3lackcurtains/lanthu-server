@@ -13,6 +13,7 @@ const startDB = async () => {
                 useUnifiedTopology: true,
                 useFindAndModify: false,
                 useCreateIndex: true,
+                keepAlive: 1,
             }
         )
 

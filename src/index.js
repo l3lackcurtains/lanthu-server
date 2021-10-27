@@ -24,7 +24,9 @@ async function startApolloServer() {
         })
     )
     app.use(helmet())
-    app.use('/', express.static(path.join(__dirname, 'public')))
+    app.use('/', (req, res) => {
+        return res.status(200).json({ name: 'Lanthu Bot', status: 'Running' })
+    })
 
     app.use('/', router)
 
