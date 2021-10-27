@@ -9,6 +9,8 @@ import { startDB } from './utils/db'
 import helmet from 'helmet'
 import { router } from './api'
 
+const PAUSE = true
+
 const PORT = process.env.PORT || 8000
 const HOST = 'localhost'
 const HEROKU = 'http://lanthu.herokuapp.com'
@@ -69,7 +71,7 @@ async function startApolloServer() {
     )
 
     await startDB()
-    await runBot()
+    if (!PAUSE) await runBot()
 }
 
 const runBot = async () => {
