@@ -106,7 +106,7 @@ const sellToken = async (trade, coin, tokenAmount, currentPrice) => {
         if (balance.lte(amountInFinal)) {
             const msg = `Low balance ${formatEther(balance)} < ${formatEther(
                 amountInFinal
-            )} while selling ${coin.name}.`
+            )} while selling ${coin.name}`
             await updateErrorStatus(trade, msg)
             return
         }
