@@ -5,8 +5,8 @@ import tokenABI from './abi/token.json'
 import swapABI from './abi/swap.json'
 
 // BINANCE SMART CHAIN
-const provider = new ethers.providers.JsonRpcProvider(
-    'https://speedy-nodes-nyc.moralis.io/8df793cfed103d132f678bdf/bsc/mainnet',
+const provider = new ethers.providers.WebSocketProvider(
+    'wss://speedy-nodes-nyc.moralis.io/8df793cfed103d132f678bdf/bsc/mainnet/ws',
     { name: 'Smart Chain', chainId: 56 }
 )
 
