@@ -9,7 +9,7 @@ import { startDB } from './utils/db'
 import helmet from 'helmet'
 import { router } from './api'
 
-const PAUSE = false
+const PAUSE = true
 
 const PORT = process.env.PORT || 8000
 const HOST = 'localhost'
