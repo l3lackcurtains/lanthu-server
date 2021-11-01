@@ -105,7 +105,7 @@ const buyToken = async (trade, coin, tokenAmount, currentPrice) => {
             const msg = `Low balance ${formatEther(balance)} < ${formatEther(
                 amountInMaxFinal
             )} while buying ${coin.name}`
-            await updateErrorStatus(trade, msg)
+            await updateErrorStatus(trade, coin, msg)
             return
         }
 
@@ -130,7 +130,7 @@ const buyToken = async (trade, coin, tokenAmount, currentPrice) => {
         await updateBoughtStatus(trade, coin, tokenAmount, currentPrice)
     } catch (e) {
         const msg = `Error on token buy! ${tokenAmount} ${coin.name} at ${currentPrice} ${coin.name}`
-        await updateErrorStatus(trade, msg, e)
+        await updateErrorStatus(trade, coin, msg, e)
     }
 }
 
@@ -151,7 +151,7 @@ const updateBoughtStatus = async (trade, coin, tokenAmount, currentPrice) => {
     await sendMessage(`${coin.name} bought`, msg)
 }
 
-const updateErrorStatus = async (trade, msg, e = '') => {
+const updateErrorStatus = async (trade, coin, msg, e = '') => {
     const newLog = new LogModal({ message: msg, details: e.toString() })
     newLog.save()
     console.log(msg, e)
