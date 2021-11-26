@@ -1,5 +1,5 @@
 import { TradeModal, TokenModal, LogModal } from './utils/db'
-import { getCurrentPrice } from './utils/helpers'
+import { getCurrentPrice, timer } from './utils/helpers'
 import { sendMessage } from './utils/notification'
 import { buyToken } from './trading/buy'
 import { sellToken } from './trading/sell'
@@ -7,7 +7,9 @@ import { sellToken } from './trading/sell'
 const startTheBot = async () => {
     const trades = await TradeModal.find()
 
-    for (let trade of trades) {
+    for await (let trade of trades) {
+        // Wait for 10 seconds and proceed.
+        await timer(1000 * 10)
         // Skip success trades..
         if (trade.status === 'COMPLETED' || trade.status === 'ERROR') continue
 

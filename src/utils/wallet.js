@@ -5,8 +5,8 @@ import tokenABI from './abi/token.json'
 import swapABI from './abi/swap.json'
 
 // BINANCE SMART CHAIN
-const provider = new ethers.providers.WebSocketProvider(
-    'wss://bsc-ws-node.nariox.org:443',
+const provider = new ethers.providers.JsonRpcProvider(
+    'https://bsc-dataseed.binance.org/',
     { name: 'Smart Chain', chainId: 56 }
 )
 

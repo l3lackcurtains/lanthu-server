@@ -8,6 +8,7 @@ import { startTheBot } from './bot'
 import { startDB } from './utils/db'
 import helmet from 'helmet'
 import { router } from './api'
+import { timer } from './utils/helpers'
 
 const PAUSE = false
 

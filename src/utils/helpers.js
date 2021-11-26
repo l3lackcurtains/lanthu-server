@@ -112,4 +112,6 @@ const getCurrentPrice = async (coin) => {
     return { currentPrice, currentPriceConversion }
 }
 
-export { getTokenPriceAndBalance, getCurrentPrice }
+const timer = (ms) => new Promise((res) => setTimeout(res, ms))
+
+export { getTokenPriceAndBalance, getCurrentPrice, timer }
