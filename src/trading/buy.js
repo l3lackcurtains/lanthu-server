@@ -10,7 +10,7 @@ import {
 } from '@pancakeswap/sdk'
 
 import { BigNumber, ethers } from 'ethers'
-import { formatEther } from 'ethers/lib/utils'
+import { formatUnits } from 'ethers/lib/utils'
 import tokenABI from '../utils/abi/token.json'
 import { TradeModal, LogModal, HistoryModal } from '../utils/db'
 import { sendMessage } from '../utils/notification'
@@ -85,7 +85,7 @@ const buyToken = async (trade, coin, tokenAmount, currentPrice) => {
             wallet.address,
             pancakeSwapContractAddress
         )
-        if (allowance.lte(amountInMaxFinal)) {
+        if (allowance.lt(amountInMaxFinal)) {
             const approved = await tokenContract.approve(
                 pancakeSwapContractAddress,
                 new ethers.BigNumber.from(maxAllowance),
@@ -101,10 +101,13 @@ const buyToken = async (trade, coin, tokenAmount, currentPrice) => {
         }
         // Check balance
         const balance = await tokenContract.balanceOf(wallet.address)
-        if (balance.lte(amountInMaxFinal)) {
-            const msg = `Low balance ${formatEther(balance)} < ${formatEther(
-                amountInMaxFinal
-            )} while buying ${coin.name}`
+        if (balance.lt(amountInMaxFinal)) {
+            const msg = `Low balance ${formatUnits(
+                balance,
+                coin.decimal
+            )} < ${formatUnits(amountInMaxFinal, coin.decimal)} while buying ${
+                coin.name
+            }`
             await updateErrorStatus(trade, coin, msg)
             return
         }
