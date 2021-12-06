@@ -9,7 +9,7 @@ const startTheBot = async () => {
 
     for await (let trade of trades) {
         // Wait for 10 seconds and proceed.
-        // await timer(1000 * 10)
+        await timer(1000 * 10)
         // Skip success trades..
         if (trade.status === 'COMPLETED' || trade.status === 'ERROR') continue
 
