@@ -1,3 +1,3 @@
 # lanthu-server
 
-Bot for automated trading.
+Bot for automated trading in binance smart chain.
